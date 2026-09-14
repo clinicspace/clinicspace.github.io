@@ -1,0 +1,1796 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClinicSpace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root{
+  --navy:#0F172A;
+  --navy-soft:#1E293B;
+  --teal:#14B8A6;
+  --teal-dark:#0D9488;
+  --teal-tint:#ECFDF9;
+  --bg:#F8FAFC;
+  --surface:#FFFFFF;
+  --surface-2:#F1F5F9;
+  --text:#0F172A;
+  --muted:#64748B;
+  --border:#E2E8F0;
+  --success:#16A34A;
+  --success-tint:#F0FDF4;
+  --warning:#D97706;
+  --warning-tint:#FFFBEB;
+  --danger:#DC2626;
+  --danger-tint:#FEF2F2;
+  --radius-lg:22px;
+  --radius-md:16px;
+  --radius-sm:10px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:0 10px 30px -8px rgba(15,23,42,.14), 0 4px 10px -4px rgba(15,23,42,.08);
+  --shadow-lg:0 24px 60px -16px rgba(15,23,42,.28);
+  --font-display:'Cairo','Tajawal',sans-serif;
+  --font-body:'Tajawal','Cairo',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0F1D;
+    --surface:#111A2E;
+    --surface-2:#0D1526;
+    --text:#E7ECF5;
+    --muted:#8C9AB3;
+    --border:#233150;
+    --teal:#2DD4BF;
+    --teal-dark:#14B8A6;
+    --teal-tint:rgba(45,212,191,.12);
+    --success-tint:rgba(22,163,74,.14);
+    --warning-tint:rgba(217,119,6,.14);
+    --danger-tint:rgba(220,38,38,.14);
+    --shadow-md:0 10px 30px -8px rgba(0,0,0,.55), 0 4px 10px -4px rgba(0,0,0,.4);
+    --shadow-lg:0 24px 60px -16px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0F1D;
+  --surface:#111A2E;
+  --surface-2:#0D1526;
+  --text:#E7ECF5;
+  --muted:#8C9AB3;
+  --border:#233150;
+  --teal:#2DD4BF;
+  --teal-dark:#14B8A6;
+  --teal-tint:rgba(45,212,191,.12);
+  --success-tint:rgba(22,163,74,.14);
+  --warning-tint:rgba(217,119,6,.14);
+  --danger-tint:rgba(220,38,38,.14);
+  --shadow-md:0 10px 30px -8px rgba(0,0,0,.55), 0 4px 10px -4px rgba(0,0,0,.4);
+  --shadow-lg:0 24px 60px -16px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.7;
+  padding:0 20px;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:800;margin:0;text-wrap:balance;color:var(--text);}
+p{margin:0;color:var(--text);}
+a{color:inherit;text-decoration:none;}
+button{font-family:var(--font-body);cursor:pointer;}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:6px;}
+.wrap{max-width:1180px;margin:0 auto;}
+.container{max-width:1180px;margin:0 auto;padding:0 4px;}
+::selection{background:var(--teal-tint);color:var(--teal-dark);}
+
+/* utility */
+.muted{color:var(--muted);}
+.center{text-align:center;}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:700;color:var(--teal-dark);
+  background:var(--teal-tint);border:1px solid rgba(20,184,166,.25);
+  padding:6px 14px;border-radius:999px;letter-spacing:.2px;
+}
+.grid{display:grid;gap:20px;}
+.flex{display:flex;}
+.section{padding-block:64px;}
+.section-head{max-width:680px;margin:0 auto 40px;text-align:center;}
+.section-head h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:14px;}
+.section-head p{color:var(--muted);font-size:17px;}
+@media (max-width:720px){.section{padding-block:44px;}}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-weight:700;font-size:15px;border-radius:999px;border:1px solid transparent;
+  padding:13px 26px;transition:transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--teal);color:#04211D;box-shadow:0 8px 22px -6px rgba(20,184,166,.55);}
+.btn-primary:hover{background:var(--teal-dark);box-shadow:0 10px 26px -6px rgba(20,184,166,.65);}
+.btn-dark{background:var(--navy);color:#fff;}
+.btn-dark:hover{background:var(--navy-soft);}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--border);}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal-dark);}
+.btn-outline-light{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.35);}
+.btn-outline-light:hover{background:rgba(255,255,255,.14);}
+.btn-sm{padding:9px 18px;font-size:13.5px;}
+.btn-block{width:100%;}
+.btn[disabled]{opacity:.55;cursor:not-allowed;}
+
+/* card */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);
+}
+.card-pad{padding:26px;}
+
+/* badge/chip */
+.chip{
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+  padding:5px 12px;border-radius:999px;
+}
+.chip-teal{background:var(--teal-tint);color:var(--teal-dark);border-color:rgba(20,184,166,.3);}
+.badge-verified{
+  display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:800;
+  background:var(--success-tint);color:var(--success);border:1px solid rgba(22,163,74,.3);
+  padding:4px 10px;border-radius:999px;
+}
+.badge-pending{
+  display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:800;
+  background:var(--warning-tint);color:var(--warning);border:1px solid rgba(217,119,6,.3);
+  padding:4px 10px;border-radius:999px;
+}
+
+/* icon */
+.icon{width:22px;height:22px;flex-shrink:0;}
+.icon-wrap{
+  width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:var(--teal-tint);color:var(--teal-dark);flex-shrink:0;
+}
+
+/* ===================== HEADER ===================== */
+.site-header{
+  position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--border);
+  margin-inline:-20px;padding-inline:20px;
+}
+.nav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:900;font-size:19px;cursor:pointer;flex-shrink:0;}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;background:linear-gradient(155deg,var(--teal),var(--teal-dark));
+  color:#04211D;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:16px;flex-shrink:0;
+}
+.nav-links{display:flex;align-items:center;gap:26px;font-size:14.5px;font-weight:700;color:var(--muted);}
+.nav-links a{padding:6px 2px;border-bottom:2px solid transparent;transition:color .15s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a.active{border-color:var(--teal);}
+.nav-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nav-lang{border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;}
+.menu-toggle{display:none;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:8px;}
+.menu-toggle svg{width:22px;height:22px;}
+@media (max-width:920px){
+  .nav-links{position:fixed;inset-inline:20px;top:70px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+    flex-direction:column;align-items:stretch;padding:14px;box-shadow:var(--shadow-lg);display:none;gap:4px;}
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:12px 10px;border-radius:10px;border-bottom:none;}
+  .nav-links a:hover,.nav-links a.active{background:var(--surface-2);}
+  .menu-toggle{display:inline-flex;}
+  .nav-actions .btn-ghost{display:none;}
+}
+
+/* ===================== HERO ===================== */
+.hero{background:linear-gradient(180deg,var(--navy) 0%,#142238 65%,var(--navy) 100%);border-radius:32px;margin-top:22px;overflow:hidden;position:relative;color:#fff;}
+.hero::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(60% 55% at 85% 0%, rgba(20,184,166,.28), transparent 60%),
+  radial-gradient(45% 40% at 10% 100%, rgba(20,184,166,.16), transparent 60%);
+  pointer-events:none;}
+.hero-inner{position:relative;padding:64px 32px 20px;display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;max-width:1180px;margin:0 auto;}
+.hero h1{color:#fff;font-size:clamp(32px,4.4vw,54px);line-height:1.18;}
+.hero-sub{color:#C9D3E3;font-size:17.5px;margin-top:18px;max-width:520px;}
+.hero-ctas{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.hero-trust{margin-top:18px;color:#9DB2C9;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.hero-search-wrap{position:relative;padding:0 32px 48px;max-width:1180px;margin:0 auto;}
+.search-bar{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:16px;backdrop-filter:blur(6px);}
+.search-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;}
+.search-field label{display:block;font-size:11.5px;color:#9DB2C9;font-weight:700;margin-bottom:6px;}
+.search-field select,.search-field input{
+  width:100%;background:rgba(255,255,255,.94);border:1px solid transparent;border-radius:11px;
+  padding:11px 10px;font-size:13.5px;font-family:var(--font-body);color:var(--navy);font-weight:600;min-width:0;
+}
+.search-grid button{white-space:nowrap;}
+@media (max-width:920px){.hero-inner{grid-template-columns:1fr;padding:44px 22px 0;}.hero-search-wrap{padding:0 22px 40px;}.search-grid{grid-template-columns:1fr 1fr;}.search-grid button{grid-column:1/-1;}}
+@media (max-width:480px){.search-grid{grid-template-columns:1fr;}}
+
+/* match preview card in hero */
+.match-preview{background:var(--surface);border-radius:20px;padding:22px;box-shadow:var(--shadow-lg);color:var(--text);}
+.match-preview-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.score-ring{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:conic-gradient(var(--teal) calc(var(--pct)*1%), var(--surface-2) 0);}
+.score-ring-inner{width:50px;height:50px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:var(--teal-dark);font-family:var(--font-display);}
+.match-reasons{display:grid;gap:9px;margin-top:14px;}
+.match-reason{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;}
+.match-reason svg{width:17px;height:17px;flex-shrink:0;}
+.match-reason.yes{color:var(--text);}
+.match-reason.yes svg{color:var(--success);}
+.match-reason.no svg{color:var(--danger);}
+
+/* ===================== GENERIC SECTIONS ===================== */
+.pain-grid{grid-template-columns:repeat(3,1fr);}
+.pain-card{padding:26px;}
+.pain-card h3{font-size:18px;margin:14px 0 8px;}
+.pain-card p{color:var(--muted);font-size:14.5px;}
+@media (max-width:800px){.pain-grid{grid-template-columns:1fr;}}
+
+.journey-grid{grid-template-columns:1fr 1fr;}
+.journey-card{padding:34px;position:relative;overflow:hidden;}
+.journey-card.doctor{background:linear-gradient(160deg,var(--navy),#1c2e4a);color:#fff;}
+.journey-card.owner{background:var(--surface);}
+.journey-card h3{font-size:24px;margin-bottom:6px;}
+.journey-card.doctor h3{color:#fff;}
+.journey-list{list-style:none;margin:20px 0 26px;padding:0;display:grid;gap:11px;}
+.journey-list li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;font-weight:600;}
+.journey-list svg{width:19px;height:19px;flex-shrink:0;margin-top:1px;color:var(--teal);}
+.journey-card.doctor .journey-list{color:#DCE4F0;}
+.journey-card.owner .journey-list{color:var(--text);}
+@media (max-width:800px){.journey-grid{grid-template-columns:1fr;}}
+
+.steps-grid{grid-template-columns:repeat(4,1fr);}
+.step-card{text-align:center;padding:22px 16px;}
+.step-num{
+  width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;font-family:var(--font-display);font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:16px;
+}
+.step-card h4{font-size:15.5px;margin-bottom:6px;}
+.step-card p{font-size:13.5px;color:var(--muted);}
+@media (max-width:900px){.steps-grid{grid-template-columns:1fr 1fr;}}
+
+.listing-grid{grid-template-columns:repeat(3,1fr);}
+@media (max-width:980px){.listing-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:640px){.listing-grid{grid-template-columns:1fr;}}
+.listing-card{overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s, transform .2s;cursor:pointer;}
+.listing-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);}
+.listing-thumb{
+  height:150px;position:relative;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--navy),#20365a);color:rgba(255,255,255,.85);
+}
+.listing-thumb svg{width:38px;height:38px;opacity:.55;}
+.listing-thumb .tag{position:absolute;top:10px;inset-inline-start:10px;}
+.listing-thumb .tag2{position:absolute;top:10px;inset-inline-end:10px;}
+.listing-body{padding:18px;display:flex;flex-direction:column;gap:10px;flex:1;}
+.listing-title{font-family:var(--font-display);font-weight:800;font-size:16px;}
+.listing-loc{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:600;}
+.listing-loc svg{width:15px;height:15px;}
+.listing-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.listing-meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;margin-top:auto;}
+.listing-price{font-family:var(--font-display);font-weight:900;color:var(--text);font-size:15px;}
+.listing-price span{font-size:11.5px;color:var(--muted);font-weight:600;}
+
+.feature-split{grid-template-columns:1fr 1fr;gap:36px;align-items:center;}
+@media (max-width:800px){.feature-split{grid-template-columns:1fr;}}
+.contact-split{grid-template-columns:1fr 1.3fr;gap:24px;align-items:start;}
+@media (max-width:800px){.contact-split{grid-template-columns:1fr;}}
+.nav-lang{display:inline-flex;}
+@media (max-width:480px){.nav-lang{display:none;}}
+@media (max-width:400px){.nav-actions{gap:6px;} .brand span{display:none;}}
+.owners-band{background:var(--navy);border-radius:30px;color:#fff;padding:52px 36px;display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;}
+.owners-band h2{color:#fff;font-size:clamp(24px,3vw,32px);}
+.owners-feat{display:grid;gap:12px;margin:20px 0 24px;}
+.owners-feat div{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:#DCE4F0;font-weight:600;}
+.owners-feat svg{width:18px;height:18px;color:var(--teal);flex-shrink:0;margin-top:2px;}
+.owners-visual{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:24px;}
+@media (max-width:860px){.owners-band{grid-template-columns:1fr;padding:34px 22px;}}
+
+.trust-grid{grid-template-columns:repeat(5,1fr);}
+.trust-item{text-align:center;padding:20px 10px;}
+.trust-item svg{width:26px;height:26px;color:var(--teal-dark);margin-bottom:10px;}
+.trust-item p{font-size:13px;font-weight:700;}
+@media (max-width:900px){.trust-grid{grid-template-columns:repeat(2,1fr);}}
+
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 4px;cursor:pointer;font-weight:700;font-size:15.5px;}
+.faq-q svg{width:20px;height:20px;flex-shrink:0;transition:transform .2s;color:var(--muted);}
+.faq-item.open .faq-q svg{transform:rotate(180deg);color:var(--teal-dark);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+.faq-item.open .faq-a{max-height:600px;}
+.faq-a p{padding:0 4px 18px;color:var(--muted);font-size:14.5px;line-height:1.8;}
+
+.final-cta{background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:30px;padding:52px 30px;text-align:center;color:#04211D;}
+.final-cta h2{color:#04211D;font-size:clamp(24px,3.2vw,34px);max-width:720px;margin:0 auto 22px;}
+.final-cta .hero-ctas{justify-content:center;}
+
+/* ===================== FOOTER ===================== */
+.site-footer{margin-top:60px;border-top:1px solid var(--border);padding:48px 0 24px;}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:30px;padding-bottom:34px;}
+.footer-cols h5{font-size:13.5px;margin-bottom:14px;color:var(--muted);font-weight:800;}
+.footer-cols ul{list-style:none;padding:0;margin:0;display:grid;gap:10px;}
+.footer-cols a{font-size:14px;color:var(--text);font-weight:600;}
+.footer-cols a:hover{color:var(--teal-dark);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;flex-wrap:wrap;gap:10px;}
+@media (max-width:860px){.footer-top{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.footer-top{grid-template-columns:1fr;}}
+
+/* ===================== GENERIC PAGE / FORM STYLES ===================== */
+.page-hero{padding:46px 0 6px;}
+.page-hero h1{font-size:clamp(26px,3.6vw,40px);}
+.page-hero p{color:var(--muted);margin-top:12px;font-size:16px;max-width:620px;}
+.breadcrumb{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px;font-weight:600;margin-bottom:14px;}
+.breadcrumb a:hover{color:var(--teal-dark);}
+
+.two-col{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;}
+@media (max-width:860px){.two-col{grid-template-columns:1fr;}}
+.filters-card{padding:20px;position:sticky;top:90px;}
+.filter-group{margin-bottom:20px;}
+.filter-group:last-child{margin-bottom:0;}
+.filter-group > label{display:block;font-weight:800;font-size:13.5px;margin-bottom:10px;}
+.filter-group select,.filter-group input[type=number],.filter-group input[type=text]{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);
+  color:var(--text);font-family:var(--font-body);font-size:14px;
+}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.check-row{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--text);}
+.check-row input{width:16px;height:16px;accent-color:var(--teal);}
+.budget-row{display:flex;gap:8px;align-items:center;}
+.results-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.results-head .count{font-weight:700;font-size:14.5px;}
+.sort-select{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:13.5px;font-weight:600;}
+.empty-state{padding:50px 20px;text-align:center;color:var(--muted);}
+.empty-state svg{width:44px;height:44px;color:var(--border);margin-bottom:14px;}
+
+/* forms */
+.form-card{max-width:760px;margin:0 auto;padding:34px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-grid.full,.field-full{grid-column:1 / -1;}
+.field label{display:block;font-weight:800;font-size:13.5px;margin-bottom:7px;}
+.field .hint{font-size:12px;color:var(--muted);font-weight:500;margin-top:5px;}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:var(--surface);
+  color:var(--text);font-family:var(--font-body);font-size:14.5px;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);}
+.field textarea{resize:vertical;min-height:90px;}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--danger);}
+.field .err{color:var(--danger);font-size:12px;margin-top:5px;display:none;font-weight:700;}
+.field.invalid .err{display:block;}
+.check-inline{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--muted);font-weight:600;}
+.check-inline input{margin-top:3px;width:16px;height:16px;accent-color:var(--teal);flex-shrink:0;}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
+.success-box{text-align:center;padding:40px 24px;}
+.code-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;font-family:var(--font-display);
+  font-weight:800;font-size:19px;letter-spacing:1px;padding:12px 22px;border-radius:14px;margin:16px 0;
+}
+
+/* details page */
+.gallery-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:10px;border-radius:var(--radius-lg);overflow:hidden;height:340px;}
+.gallery-grid .g-main,.gallery-stack{border-radius:0;}
+.gallery-stack{display:grid;grid-template-rows:1fr 1fr;gap:10px;}
+.g-tile{background:linear-gradient(135deg,var(--navy),#233a5e);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,.7);}
+.g-tile svg{width:34px;height:34px;opacity:.6;}
+.g-tile span{font-size:12px;font-weight:700;}
+@media (max-width:700px){.gallery-grid{grid-template-columns:1fr;height:auto;}.gallery-stack{grid-template-rows:1fr 1fr;height:180px;}}
+
+.details-layout{display:grid;grid-template-columns:1fr 340px;gap:28px;margin-top:24px;align-items:start;}
+@media (max-width:900px){.details-layout{grid-template-columns:1fr;}}
+.spec-row{display:flex;flex-wrap:wrap;gap:8px;}
+.avail-strip{display:flex;gap:6px;flex-wrap:wrap;}
+.day-pill{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;border:1px solid var(--border);color:var(--muted);}
+.day-pill.on{background:var(--teal-tint);color:var(--teal-dark);border-color:rgba(20,184,166,.3);}
+.facility-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.facility-item{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;}
+.facility-item svg{width:17px;height:17px;color:var(--success);flex-shrink:0;}
+.sticky-side{position:sticky;top:90px;}
+.district-note{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border-radius:14px;padding:14px;font-size:13px;color:var(--muted);}
+.district-note svg{width:18px;height:18px;flex-shrink:0;color:var(--muted);margin-top:1px;}
+
+/* match results */
+.match-card{padding:22px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;}
+@media (max-width:700px){.match-card{grid-template-columns:1fr;text-align:center;}}
+.match-card .score-ring{width:74px;height:74px;}
+.match-card .score-ring-inner{width:58px;height:58px;font-size:17px;}
+
+/* dashboards / admin */
+.dash-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:24px;}
+.kpi-grid{grid-template-columns:repeat(4,1fr);margin-bottom:26px;}
+@media (max-width:800px){.kpi-grid{grid-template-columns:1fr 1fr;}}
+.kpi-card{padding:18px 20px;}
+.kpi-card .val{font-family:var(--font-display);font-size:26px;font-weight:900;}
+.kpi-card .lbl{color:var(--muted);font-size:12.5px;font-weight:700;margin-top:4px;}
+.table-wrap{overflow-x:auto;}
+table.data-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
+table.data-table th{text-align:right;color:var(--muted);font-weight:700;font-size:12.5px;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.data-table td{padding:12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.data-table tr:last-child td{border-bottom:none;}
+.tab-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.tab-btn{padding:10px 4px;font-weight:700;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;background:none;border-top:none;border-inline:none;margin-inline-end:16px;}
+.tab-btn.active{color:var(--text);border-color:var(--teal);}
+.passcode-box{max-width:380px;margin:60px auto;text-align:center;padding:36px;}
+
+/* legal */
+.legal-content{max-width:760px;margin:0 auto;}
+.legal-content h3{font-size:18px;margin:28px 0 10px;}
+.legal-content p,.legal-content li{color:var(--muted);font-size:14.5px;line-height:1.85;}
+.legal-content ul{padding-inline-start:20px;margin:8px 0;}
+.legal-note{background:var(--warning-tint);border:1px solid rgba(217,119,6,.25);border-radius:14px;padding:14px 16px;font-size:13.5px;color:var(--warning);margin-bottom:24px;font-weight:600;}
+
+/* toast */
+#toast{position:fixed;bottom:22px;inset-inline:0;display:flex;justify-content:center;z-index:200;pointer-events:none;}
+#toast .msg{background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:700;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(10px);transition:opacity .25s, transform .25s;}
+#toast .msg.show{opacity:1;transform:translateY(0);}
+</style>
+
+<div id="app"></div>
+<div id="toast"><div class="msg" id="toastMsg"></div></div>
+
+<script>
+(function(){
+"use strict";
+document.documentElement.setAttribute('lang','ar');
+document.documentElement.setAttribute('dir','rtl');
+
+/* ===================== BRAND CONFIG (swap here to rebrand) ===================== */
+var BRAND = {
+  name:'ClinicSpace',
+  nameAr:'كلينك سبيس',
+  mark:'CS',
+  tagline:'عيادتك في المكان والوقت المناسب',
+  supportEmail:'info@clinicspace.eg',
+  supportPhone:'01xxxxxxxxx'
+};
+
+/* ===================== ICONS (inline SVG, stroke-based) ===================== */
+function icon(name){
+  var p = {
+    pin:'<path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+    check:'<path d="m20 6-11 11L4 12"/>',
+    x:'<path d="M18 6 6 18M6 6l12 12"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+    money:'<rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/>',
+    tools:'<path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.7 2.7-2.3-2.3 2.7-2.7Z"/>',
+    clockx:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    doctor:'<circle cx="12" cy="8" r="3.2"/><path d="M4.5 21c0-4.2 3.4-6.5 7.5-6.5s7.5 2.3 7.5 6.5"/>',
+    building:'<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M4 21h16M8 21v-4h4v4M8 9h1M8 13h1M13 9h1M13 13h1M14 3h4a2 2 0 0 1 2 2v16"/>',
+    arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+    chev:'<path d="m6 9 6 6 6-6"/>',
+    shield:'<path d="M12 3l8 3.5v5c0 5-3.4 8.5-8 9.5-4.6-1-8-4.5-8-9.5v-5L12 3Z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+    lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/>',
+    users:'<circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.8 14.2c2.4.5 4.2 2.5 4.2 5.3"/>',
+    support:'<path d="M12 3a9 9 0 0 0-9 9v5a2 2 0 0 0 2 2h1v-7H4a8 8 0 0 1 16 0h-2v7h1a2 2 0 0 0 2-2v-5a9 9 0 0 0-9-9Z"/><path d="M6 17v2a2 2 0 0 0 2 2h2"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+    wifi:'<path d="M5 9a11 11 0 0 1 14 0M8 12.5a7 7 0 0 1 8 0M11.5 16a2.5 2.5 0 0 1 1 0"/><circle cx="12" cy="19" r=".6" fill="currentColor"/>',
+    parking:'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 16V8h3.2a2.6 2.6 0 1 1 0 5.2H9"/>',
+    bed:'<path d="M3 18v-8a2 2 0 0 1 2-2h6M3 18h18M3 14h18M13 8h6a2 2 0 0 1 2 2v4M7 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>',
+    star:'<path d="m12 3 2.6 5.9 6.4.6-4.8 4.3 1.4 6.2L12 16.9 6.4 20l1.4-6.2L3 9.5l6.4-.6L12 3Z"/>',
+    mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',
+    phone:'<path d="M6 3h3l1.5 4.5-2 1.8a12 12 0 0 0 5.7 5.7l1.8-2L20 15v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2Z"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    filter:'<path d="M4 6h16M7 12h10M10 18h4"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/>',
+    edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/>',
+    logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+    dashboard:'<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>',
+    heart:'<path d="M12 20s-7.5-4.6-9.5-9.3C1.2 7.5 3 4.5 6.2 4.2c1.9-.2 3.6.9 4.8 2.6 1.2-1.7 2.9-2.8 4.8-2.6 3.2.3 5 3.3 3.7 6.5C19.5 15.4 12 20 12 20Z"/>',
+    trash:'<path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/>',
+    globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>'
+  }[name] || '';
+  return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+}
+
+/* ===================== DATA / LOCATION ARCHITECTURE ===================== */
+var DISTRICTS = [
+  {name:'الشيخ زايد', gov:'الجيزة'},
+  {name:'٦ أكتوبر', gov:'الجيزة'},
+  {name:'المهندسين', gov:'الجيزة'},
+  {name:'الدقي', gov:'الجيزة'},
+  {name:'مدينة نصر', gov:'القاهرة'},
+  {name:'مصر الجديدة', gov:'القاهرة'},
+  {name:'المعادي', gov:'القاهرة'},
+  {name:'القاهرة الجديدة', gov:'القاهرة'},
+  {name:'التجمع الأول', gov:'القاهرة'},
+  {name:'التجمع الخامس', gov:'القاهرة'}
+];
+var GOVERNORATES = ['القاهرة','الجيزة'];
+var SPECIALTIES = ['جلدية','تغذية علاجية','نفسي وعلاج سلوكي','باطنة','أسنان','عظام','أطفال','نساء وتوليد','عيون','أنف وأذن وحنجرة','مسالك بولية','قلب وأوعية دموية','جهاز هضمي','تخسيس ونحت','علاج طبيعي','تخاطب'];
+var DAYS = [{id:'sat',name:'السبت',short:'سبت'},{id:'sun',name:'الأحد',short:'حد'},{id:'mon',name:'الإتنين',short:'إتنين'},{id:'tue',name:'التلات',short:'تلات'},{id:'wed',name:'الأربع',short:'أربع'},{id:'thu',name:'الخميس',short:'خميس'},{id:'fri',name:'الجمعة',short:'جمعة'}];
+function dayName(id){ for(var i=0;i<DAYS.length;i++) if(DAYS[i].id===id) return DAYS[i].name; return id; }
+var SHIFTS = [{id:'morning',name:'صباحي (٩ص – ٤م)'},{id:'evening',name:'مسائي (٤م – ١٠م)'},{id:'full',name:'يوم كامل'},{id:'flex',name:'مرن حسب الاتفاق'}];
+function shiftName(id){ for(var i=0;i<SHIFTS.length;i++) if(SHIFTS[i].id===id) return SHIFTS[i].name; return id; }
+var CLINIC_TYPES = ['عيادة كاملة مجهزة','غرفة داخل مركز طبي','غرفة داخل عيادة قائمة','مساحة مشتركة (كو-وركينج طبي)'];
+var RENTAL_TYPES = [{id:'monthly',name:'شهري'},{id:'days',name:'أيام محددة أسبوعيًا'},{id:'morning',name:'شيفت صباحي'},{id:'evening',name:'شيفت مسائي'},{id:'full',name:'يوم كامل'},{id:'flex',name:'مرن'}];
+var FACILITIES = ['استقبال','صالة انتظار','سكرتارية','واي فاي','تكييف','مصعد','باركينج','حمام','خدمة نظافة','أمن','مناسب لذوي الهمم'];
+var MED_FACILITIES = ['سرير كشف','حوض غسيل','تعقيم','تخزين طبي','أجهزة متاحة للاستخدام'];
+
+var FALLBACK_LISTINGS = [
+  {id:'l1',title:'عيادة مجهزة بالكامل',district:'الشيخ زايد',gov:'الجيزة',type:'عيادة كاملة مجهزة',specialties:['جلدية','تغذية علاجية','نفسي وعلاج سلوكي'],days:['sat','mon','wed'],shift:'evening',price:6000,facilities:['استقبال','صالة انتظار','واي فاي','تكييف','باركينج'],medFacilities:['سرير كشف','حوض غسيل','تعقيم'],verified:true,desc:'عيادة حديثة داخل مجمع طبي بالشيخ زايد، تشطيب فاخر وتجهيز كامل، مناسبة للتخصصات التجميلية والتغذية والاستشارات النفسية.'},
+  {id:'l2',title:'غرفة داخل مركز طبي متكامل',district:'مدينة نصر',gov:'القاهرة',type:'غرفة داخل مركز طبي',specialties:['عظام','علاج طبيعي'],days:['sun','tue','thu'],shift:'morning',price:4500,facilities:['استقبال','تكييف','مصعد','أمن'],medFacilities:['سرير كشف','تخزين طبي'],verified:true,desc:'غرفة داخل مركز طبي معروف في مدينة نصر، قريبة من المترو، فيها استقبال مشترك وموظفين بيستقبلوا المرضى بالمواعيد.'},
+  {id:'l3',title:'عيادة كاملة لطب الأطفال والنساء',district:'المعادي',gov:'القاهرة',type:'عيادة كاملة مجهزة',specialties:['أطفال','نساء وتوليد'],days:['sat','sun','mon','tue','wed'],shift:'full',price:9500,facilities:['استقبال','صالة انتظار','سكرتارية','واي فاي','تكييف','باركينج','حمام'],medFacilities:['سرير كشف','حوض غسيل','تعقيم','تخزين طبي','أجهزة متاحة للاستخدام'],verified:true,desc:'عيادة متكاملة في المعادي بموقع هادي وقريب من الكورنيش، تجهيز كامل لطب الأطفال والنساء والتوليد مع إمكانية العمل يوم كامل.'},
+  {id:'l4',title:'غرفة داخل عيادة أسنان قائمة',district:'الدقي',gov:'الجيزة',type:'غرفة داخل عيادة قائمة',specialties:['أسنان'],days:['tue','wed','thu'],shift:'evening',price:3800,facilities:['استقبال','واي فاي','تكييف'],medFacilities:['سرير كشف','تعقيم'],verified:false,desc:'غرفة إضافية داخل عيادة أسنان قائمة في الدقي، فرصة كويسة لطبيب أسنان بيدور على أيام محددة بدون تكلفة تجهيز.'},
+  {id:'l5',title:'مساحة هادئة للعلاج النفسي والتخاطب',district:'المهندسين',gov:'الجيزة',type:'غرفة داخل مركز طبي',specialties:['نفسي وعلاج سلوكي','تخاطب'],days:['sun','mon','wed'],shift:'flex',price:5200,facilities:['استقبال','صالة انتظار','واي فاي','تكييف','مصعد'],medFacilities:[],verified:true,desc:'غرفة هادئة معزولة صوتيًا داخل مركز تأهيل بالمهندسين، مناسبة تمامًا لجلسات العلاج النفسي والتخاطب.'},
+  {id:'l6',title:'عيادة قلب وباطنة مجهزة',district:'مصر الجديدة',gov:'القاهرة',type:'عيادة كاملة مجهزة',specialties:['قلب وأوعية دموية','باطنة'],days:['sat','tue','thu'],shift:'morning',price:7000,facilities:['استقبال','باركينج','تكييف','أمن'],medFacilities:['سرير كشف','أجهزة متاحة للاستخدام'],verified:true,desc:'عيادة بمصر الجديدة قريبة من شارع الميرغني، مجهزة بأجهزة متابعة أساسية ومناسبة لأطباء القلب والباطنة.'},
+  {id:'l7',title:'مساحة مشتركة (كو-وركينج طبي)',district:'التجمع الخامس',gov:'القاهرة',type:'مساحة مشتركة (كو-وركينج طبي)',specialties:['تخسيس ونحت','تغذية علاجية','جلدية'],days:['sun','mon','wed','thu'],shift:'flex',price:6500,facilities:['استقبال','واي فاي','تكييف','باركينج','مصعد'],medFacilities:['تعقيم','أجهزة متاحة للاستخدام'],verified:true,desc:'كونسبت جديد للكو-وركينج الطبي في التجمع الخامس، تحجز الساعة أو اليوم اللي يناسبك بمرونة كاملة.'},
+  {id:'l8',title:'عيادة عيون وأنف وأذن',district:'٦ أكتوبر',gov:'الجيزة',type:'عيادة كاملة مجهزة',specialties:['عيون','أنف وأذن وحنجرة'],days:['sat','mon','wed','thu'],shift:'evening',price:5500,facilities:['استقبال','صالة انتظار','تكييف','باركينج'],medFacilities:['سرير كشف','تعقيم','أجهزة متاحة للاستخدام'],verified:false,desc:'عيادة في ٦ أكتوبر قريبة من الحي المتميز، تجهيز مناسب لتخصصات العيون والأنف والأذن والحنجرة.'},
+  {id:'l9',title:'غرفة لتخصصات الباطنة والجهاز الهضمي',district:'التجمع الأول',gov:'القاهرة',type:'غرفة داخل مركز طبي',specialties:['مسالك بولية','جهاز هضمي','باطنة'],days:['sun','tue'],shift:'morning',price:4800,facilities:['استقبال','تكييف','مصعد','أمن','مناسب لذوي الهمم'],medFacilities:['سرير كشف','حوض غسيل'],verified:true,desc:'مركز طبي بالتجمع الأول متاح فيه غرفة بيومين أسبوعيًا، مناسب جدًا لطبيب بيحتاج أيام محددة بس.'},
+  {id:'l10',title:'غرفة داخل عيادة أطفال قائمة',district:'المعادي',gov:'القاهرة',type:'غرفة داخل عيادة قائمة',specialties:['أطفال','تخاطب'],days:['sat','tue','thu'],shift:'evening',price:4000,facilities:['استقبال','واي فاي','تكييف'],medFacilities:['سرير كشف'],verified:false,desc:'عيادة أطفال قائمة في المعادي فيها غرفة إضافية فاضية ٣ أيام في الأسبوع، فرصة لطبيب تخاطب أو أطفال يبدأ بيها.'}
+];
+
+/* ===================== SUPABASE BACKEND (real shared database) ===================== */
+var SUPA_URL = 'https://fcukoqyftnafrarczdul.supabase.co';
+var SUPA_KEY = 'sb_publishable_MtVFhyo8cvx3rqUTkSWb1Q_knoaCUK6';
+var FUNC_URL = SUPA_URL + '/functions/v1/api';
+function supaHeaders(){ return {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}; }
+function supaInsert(table, row){
+  return fetch(SUPA_URL+'/rest/v1/'+table, { method:'POST', headers:supaHeaders(), body:JSON.stringify(row) })
+    .then(function(res){ if(!res.ok){ return res.text().then(function(t){ throw new Error('supaInsert:'+res.status+':'+t); }); } return true; });
+}
+function callApi(action, payload){
+  var body = {action:action};
+  for(var k in (payload||{})) body[k] = payload[k];
+  return fetch(FUNC_URL, { method:'POST', headers:supaHeaders(), body:JSON.stringify(body) })
+    .then(function(res){ return res.json().then(function(data){
+      if(!res.ok){ var err=new Error((data&&data.error)||('callApi:'+res.status)); err.status=res.status; throw err; }
+      return data;
+    }); });
+}
+function normalizeListingRow(row){
+  return {
+    id:row.id, title:row.title, district:row.district, gov:row.gov, type:row.type,
+    specialties:row.specialties||[], days:row.days||[], shift:row.shift, price:Number(row.price),
+    facilities:row.facilities||[], medFacilities:row.med_facilities||[], verified:!!row.verified,
+    desc:row.description||'', ownerName:row.owner_name||'', ownerPhone:row.owner_phone||'', ownerEmail:row.owner_email||'',
+    trackingCode:row.tracking_code||'', status:row.status||'', isSeed:!!row.is_seed, createdAt:row.created_at
+  };
+}
+function normalizeRequestRow(row){
+  return {
+    id:row.id, name:row.name, phone:row.phone, email:row.email||'', specialty:row.specialty,
+    gov:row.gov||'', district:row.district||'', rental:row.rental||'', budgetMax:row.budget_max,
+    days:row.days||[], facilities:row.facilities||[], notes:row.notes||'',
+    trackingCode:row.tracking_code, status:row.status||'', createdAt:row.created_at
+  };
+}
+var LISTINGS_CACHE = null;
+function fetchPublicListings(){
+  return fetch(SUPA_URL+'/rest/v1/public_listings?select=*&order=created_at.desc', { headers:supaHeaders() })
+    .then(function(res){ if(!res.ok) throw new Error('fetch listings:'+res.status); return res.json(); })
+    .then(function(rows){ return rows.map(normalizeListingRow); });
+}
+function ensureListings(force){
+  if(LISTINGS_CACHE && !force) return Promise.resolve(LISTINGS_CACHE);
+  return fetchPublicListings().then(function(rows){
+    LISTINGS_CACHE = rows; return LISTINGS_CACHE;
+  }).catch(function(){ LISTINGS_CACHE = LISTINGS_CACHE || FALLBACK_LISTINGS; return LISTINGS_CACHE; });
+}
+function allListings(){ return LISTINGS_CACHE || FALLBACK_LISTINGS; }
+function findListing(id){ var l=allListings(); for(var i=0;i<l.length;i++) if(l[i].id===id) return l[i]; return null; }
+function genCode(prefix){ return prefix+'-'+Math.floor(10000+Math.random()*89999); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+/* ===================== MATCHING ALGORITHM ===================== */
+function computeMatch(req, listing){
+  var score = 0; var reasons = [];
+  if(req.specialty){
+    var pass = listing.specialties.indexOf(req.specialty) !== -1;
+    if(pass) score += 30;
+    reasons.push({label:'مناسبة للتخصص المطلوب', pass:pass});
+  } else { score += 30; }
+  var locPass = true, locScore = 0;
+  if(req.district){
+    if(listing.district === req.district){ locScore = 25; locPass = true; }
+    else if(req.gov && listing.gov === req.gov){ locScore = 12; locPass = true; }
+    else { locScore = 0; locPass = false; }
+    reasons.push({label:'المنطقة مناسبة', pass:locPass});
+  } else { locScore = 25; }
+  score += locScore;
+  var budgetPass = true, budgetScore = 0;
+  if(req.budgetMax){
+    if(listing.price <= Number(req.budgetMax)){ budgetScore = 20; budgetPass = true; }
+    else if(listing.price <= Number(req.budgetMax)*1.15){ budgetScore = 9; budgetPass = false; }
+    else { budgetScore = 0; budgetPass = false; }
+    reasons.push({label:'داخل الميزانية', pass:budgetPass});
+  } else { budgetScore = 20; }
+  score += budgetScore;
+  var daysPass = true, daysScore = 0;
+  if(req.days && req.days.length){
+    var overlap = req.days.filter(function(d){ return listing.days.indexOf(d) !== -1; });
+    daysScore = Math.round((overlap.length/req.days.length)*15);
+    daysPass = overlap.length > 0;
+    reasons.push({label:'الأيام المطلوبة متاحة', pass:daysPass});
+  } else { daysScore = 15; }
+  score += daysScore;
+  var facPass = true, facScore = 0;
+  if(req.facilities && req.facilities.length){
+    var have = req.facilities.filter(function(f){ return listing.facilities.indexOf(f)!==-1 || listing.medFacilities.indexOf(f)!==-1; });
+    facScore = Math.round((have.length/req.facilities.length)*10);
+    facPass = have.length === req.facilities.length;
+    reasons.push({label:'الخدمات المطلوبة موجودة', pass:facPass});
+  } else { facScore = 10; }
+  score += facScore;
+  return {score:Math.max(0,Math.min(100,Math.round(score))), reasons:reasons, listing:listing};
+}
+function topMatches(req, n){
+  var list = allListings().map(function(l){ return computeMatch(req,l); });
+  list.sort(function(a,b){ return b.score-a.score; });
+  return list.slice(0, n||5);
+}
+
+/* ===================== SHARED UI PARTS ===================== */
+function scoreRing(pct){
+  return '<div class="score-ring" style="--pct:'+pct+'"><div class="score-ring-inner">'+pct+'%</div></div>';
+}
+function listingCard(l){
+  var verifiedBadge = l.verified ? '<span class="badge-verified">'+icon('shield')+' موثّقة</span>' : '<span class="badge-pending">'+icon('clockx')+' قيد المراجعة</span>';
+  return '<div class="card listing-card" data-go="clinic/'+l.id+'">'+
+    '<div class="listing-thumb">'+icon('building')+'<span class="chip tag" style="position:absolute;top:10px;inset-inline-start:10px;max-width:62%;white-space:normal;line-height:1.3;font-size:11.5px;background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.3)">'+esc(l.type)+'</span>'+
+    '<span class="tag2" style="position:absolute">'+verifiedBadge+'</span></div>'+
+    '<div class="listing-body">'+
+      '<div class="listing-title">'+esc(l.title)+'</div>'+
+      '<div class="listing-loc">'+icon('pin')+esc(l.district)+' — '+esc(l.gov)+'</div>'+
+      '<div class="listing-tags">'+l.specialties.slice(0,3).map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join('')+'</div>'+
+      '<div class="listing-meta"><span>'+l.days.map(dayName).join('، ')+' · '+shiftName(l.shift)+'</span></div>'+
+      '<div class="listing-meta" style="border-top:none;padding-top:0;">'+
+        '<span class="listing-price">'+l.price.toLocaleString('en-US')+' <span>ج.م / شهريًا</span></span>'+
+        '<span class="btn btn-ghost btn-sm">التفاصيل '+icon('arrow')+'</span>'+
+      '</div>'+
+    '</div></div>';
+}
+function toast(msg){
+  var t = document.getElementById('toastMsg');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ===================== ROUTER ===================== */
+var routes = {};
+function register(path, fn){ routes[path] = fn; }
+function navigate(hash){ window.location.hash = hash; }
+function currentRoute(){
+  var h = window.location.hash.replace(/^#\/?/, '');
+  var parts = h.split('?');
+  var seg = parts[0].split('/').filter(Boolean);
+  var query = {};
+  if(parts[1]){ parts[1].split('&').forEach(function(kv){ var p=kv.split('='); if(p[0]) query[decodeURIComponent(p[0])] = decodeURIComponent(p[1]||''); }); }
+  return {seg:seg, query:query, top: seg[0]||'home'};
+}
+function render(){
+  var r = currentRoute();
+  var app = document.getElementById('app');
+  var key = r.top || 'home';
+  var fn = routes[key] || routes['notfound'];
+  window.scrollTo(0,0);
+  app.innerHTML = '';
+  updateNavActive(key);
+  var toggle = document.querySelector('.nav-links');
+  if(toggle) toggle.classList.remove('open');
+  ensureListings().then(function(){ fn(app, r); }, function(){ fn(app, r); });
+}
+function updateNavActive(key){
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('data-key')===key);
+  });
+}
+document.addEventListener('click', function(e){
+  var g = e.target.closest('[data-go]');
+  if(g){ navigate('/'+g.getAttribute('data-go')); }
+});
+window.addEventListener('hashchange', render);
+
+/* ===================== SHELL: HEADER + FOOTER ===================== */
+function renderShell(){
+  var header = document.createElement('header');
+  header.className = 'site-header';
+  header.innerHTML =
+    '<div class="nav-inner">'+
+      '<div class="brand" data-go=""><div class="brand-mark">'+BRAND.mark+'</div><span>'+BRAND.name+'</span></div>'+
+      '<nav class="nav-links">'+
+        '<a href="#/" data-key="home">الرئيسية</a>'+
+        '<a href="#/find" data-key="find">دوّر على عيادة</a>'+
+        '<a href="#/list-space" data-key="list-space">عندي مساحة</a>'+
+        '<a href="#/how-it-works" data-key="how-it-works">إزاي بتشتغل</a>'+
+        '<a href="#/faq" data-key="faq">الأسئلة الشائعة</a>'+
+        '<a href="#/contact" data-key="contact">تواصل معنا</a>'+
+      '</nav>'+
+      '<div class="nav-actions">'+
+        '<button class="nav-lang" title="النسخة الإنجليزية قريبًا">EN</button>'+
+        '<a href="#/login" class="btn btn-ghost btn-sm">تسجيل الدخول</a>'+
+        '<a href="#/register" class="btn btn-primary btn-sm">سجّل دلوقتي</a>'+
+        '<button class="menu-toggle" id="menuToggle">'+icon('menu')+'</button>'+
+      '</div>'+
+    '</div>';
+  document.body.insertBefore(header, document.getElementById('app'));
+
+  var footer = document.createElement('footer');
+  footer.className = 'site-footer';
+  footer.innerHTML =
+    '<div class="wrap">'+
+    '<div class="footer-top">'+
+      '<div class="footer-cols">'+
+        '<div class="brand" data-go="" style="margin-bottom:12px;"><div class="brand-mark">'+BRAND.mark+'</div><span>'+BRAND.name+'</span></div>'+
+        '<p class="muted" style="font-size:13.5px;max-width:280px;">منصة مصرية بتربط الدكاترة بالمساحات الطبية غير المستغلة — Matching متخصص مش مجرد إعلانات عقارية.</p>'+
+      '</div>'+
+      '<div class="footer-cols"><h5>المنصة</h5><ul>'+
+        '<li><a href="#/">الرئيسية</a></li><li><a href="#/how-it-works">إزاي بتشتغل</a></li><li><a href="#/faq">الأسئلة الشائعة</a></li><li><a href="#/about">من نحن</a></li>'+
+      '</ul></div>'+
+      '<div class="footer-cols"><h5>حسابك</h5><ul>'+
+        '<li><a href="#/login">تسجيل الدخول</a></li><li><a href="#/register">التسجيل</a></li><li><a href="#/find">دوّر على عيادة</a></li><li><a href="#/list-space">عندي مساحة</a></li>'+
+      '</ul></div>'+
+      '<div class="footer-cols"><h5>قانوني وتواصل</h5><ul>'+
+        '<li><a href="#/contact">تواصل معنا</a></li><li><a href="#/privacy">سياسة الخصوصية</a></li><li><a href="#/terms">الشروط والأحكام</a></li>'+
+      '</ul></div>'+
+    '</div>'+
+    '<div class="footer-bottom"><span>© '+new Date().getFullYear()+' '+BRAND.name+' — كل الحقوق محفوظة</span><span>نسخة MVP تجريبية للتحقق من فكرة المنتج</span></div>'+
+    '</div>';
+  document.body.appendChild(footer);
+
+  document.getElementById('menuToggle').addEventListener('click', function(){
+    document.querySelector('.nav-links').classList.toggle('open');
+  });
+}
+
+/* ===================== PLACEHOLDER (temporary, replaced per page) ===================== */
+function pagePlaceholder(name){
+  return '<div class="section container"><div class="empty-state card">'+icon('info')+'<h3>'+name+'</h3><p>هذه الصفحة قيد الإنشاء.</p></div></div>';
+}
+
+/* ===================================================================
+   HOME PAGE
+   =================================================================== */
+register('home', function(root){
+  root.innerHTML =
+  '<section class="hero container">'+
+    '<div class="hero-inner">'+
+      '<div>'+
+        '<span class="eyebrow" style="background:rgba(20,184,166,.14);color:#5EEAD4;border-color:rgba(20,184,166,.35);">'+icon('star')+' منصة مصرية جديدة — نسخة Beta</span>'+
+        '<h1 style="margin-top:18px;">'+BRAND.tagline+'</h1>'+
+        '<p class="hero-sub">منصة بتساعد الدكاترة يلاقوا عيادات وغرف طبية مجهزة بالأيام والمواعيد المناسبة ليهم، وبتساعد أصحاب العيادات يستفيدوا من المساحات والأوقات غير المستغلة.</p>'+
+        '<div class="hero-ctas">'+
+          '<a href="#/find" class="btn btn-primary">بدور على عيادة</a>'+
+          '<a href="#/list-space" class="btn btn-outline-light">عندي مساحة متاحة</a>'+
+        '</div>'+
+        '<div class="hero-trust">'+icon('shield')+' Matching متخصص للدكاترة — مش مجرد إعلانات عقارية</div>'+
+      '</div>'+
+      '<div class="match-preview">'+
+        '<div class="match-preview-top"><div><div style="font-weight:800;font-size:15px;">عيادة مجهزة — الشيخ زايد</div><div class="muted" style="font-size:12.5px;margin-top:3px;">جلدية · تغذية · نفسي · باطنة</div></div>'+scoreRing(92)+'</div>'+
+        '<div class="match-reasons">'+
+          '<div class="match-reason yes">'+icon('check')+' المنطقة مناسبة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' الأيام المطلوبة متاحة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' داخل الميزانية</div>'+
+          '<div class="match-reason yes">'+icon('check')+' الخدمات المطلوبة موجودة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' مناسبة للتخصص</div>'+
+        '</div>'+
+        '<a href="#/find" class="btn btn-primary btn-block" style="margin-top:18px;">اعمل Match دلوقتي</a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="hero-search-wrap">'+
+      '<form class="search-bar" id="heroSearch">'+
+        '<div class="search-grid">'+
+          '<div class="search-field"><label>المنطقة</label><select name="district"><option value="">كل المناطق</option>'+DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'">'+esc(d.name)+'</option>';}).join('')+'</select></div>'+
+          '<div class="search-field"><label>التخصص</label><select name="specialty"><option value="">كل التخصصات</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
+          '<div class="search-field"><label>الأيام المطلوبة</label><select name="shift"><option value="">أي وقت</option>'+SHIFTS.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>';}).join('')+'</select></div>'+
+          '<div class="search-field"><label>الميزانية (حتى)</label><input type="number" name="budget" placeholder="مثال: 6000"></div>'+
+          '<button class="btn btn-primary" type="submit">شوف الأماكن المناسبة</button>'+
+        '</div>'+
+      '</form>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="section-head"><h2>ليه تدفع تكلفة عيادة كاملة لو محتاجها يومين أو ٣ في الأسبوع؟</h2></div>'+
+    '<div class="grid pain-grid">'+
+      '<div class="card pain-card"><div class="icon-wrap">'+icon('money')+'</div><h3>إيجارات مرتفعة</h3><p>إيجار عيادة كاملة شهريًا تكلفة كبيرة، خصوصًا في المناطق المطلوبة زي التجمع والشيخ زايد.</p></div>'+
+      '<div class="card pain-card"><div class="icon-wrap">'+icon('tools')+'</div><h3>تكلفة تجهيز وتشغيل</h3><p>التجهيز والتشطيب والموظفين والفواتير الشهرية بتزيد العبء على أي دكتور بيبدأ من الصفر.</p></div>'+
+      '<div class="card pain-card"><div class="icon-wrap">'+icon('clockx')+'</div><h3>أيام كتير غير مستغلة</h3><p>في المقابل، عيادات كتير قائمة فيها أيام أو شيفتات فاضية تمامًا وممكن تتحول لدخل إضافي.</p></div>'+
+    '</div>'+
+    '<p class="center muted" style="max-width:640px;margin:26px auto 0;">'+BRAND.name+' بتحل المشكلتين مع بعض: بتوصل الدكتور اللي محتاج مكان بصاحب العيادة اللي عنده وقت فاضي، من غير ما أي طرف يدفع أو يستلم تكلفة عيادة كاملة غير مستغلة.</p>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="section-head"><span class="eyebrow">اختار رحلتك</span><h2 style="margin-top:14px;">إنت هنا كدكتور محتاج مكان، ولا صاحب عيادة عنده مساحة فاضية؟</h2></div>'+
+    '<div class="grid journey-grid">'+
+      '<div class="card journey-card doctor">'+
+        '<div class="icon-wrap" style="background:rgba(20,184,166,.16);">'+icon('doctor')+'</div>'+
+        '<h3 style="margin-top:16px;">أنا دكتور وبدور على عيادة</h3>'+
+        '<p class="muted" style="color:#B9C6DC;">هنرشحلك أفضل مكان يناسب تخصصك وأيامك وميزانيتك.</p>'+
+        '<ul class="journey-list">'+
+          '<li>'+icon('check')+' اختار المنطقة</li><li>'+icon('check')+' حدد الأيام</li><li>'+icon('check')+' حدد الميزانية</li><li>'+icon('check')+' اختار الخدمات المطلوبة</li><li>'+icon('check')+' هنرشحلك أنسب الأماكن</li>'+
+        '</ul>'+
+        '<a href="#/need-clinic" class="btn btn-primary btn-block">ابدأ طلبك</a>'+
+      '</div>'+
+      '<div class="card journey-card owner">'+
+        '<div class="icon-wrap">'+icon('building')+'</div>'+
+        '<h3 style="margin-top:16px;">عندي عيادة أو غرفة متاحة</h3>'+
+        '<p class="muted">حوّل الأيام والغرف غير المستغلة لدخل إضافي ثابت.</p>'+
+        '<ul class="journey-list">'+
+          '<li>'+icon('check')+' أضف بيانات المكان</li><li>'+icon('check')+' حدد الأيام الفاضية</li><li>'+icon('check')+' حدد السعر</li><li>'+icon('check')+' استقبل دكاترة مناسبين</li><li>'+icon('check')+' زوّد استفادتك من العيادة</li>'+
+        '</ul>'+
+        '<a href="#/list-space" class="btn btn-dark btn-block">اعرض مساحتك</a>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="section-head"><h2>إزاي بتشتغل المنصة؟</h2><p>فريقنا بينسّق كل خطوة، من الطلب لحد التعاقد.</p></div>'+
+    '<div class="grid steps-grid">'+
+      '<div class="card step-card"><div class="step-num">١</div><h4>قولنا محتاج إيه</h4><p>سجّل طلبك أو مساحتك ببياناتك الأساسية.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٢</div><h4>بنراجع طلبك</h4><p>فريقنا بيتحقق من البيانات ويتأكد إنها كاملة وصحيحة.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٣</div><h4>بنرشحلك أفضل Match</h4><p>خوارزمية المطابقة بتختار أقرب الأماكن أو الدكاترة لمتطلباتك.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٤</div><h4>ننسق المعاينة والتعاقد</h4><p>بيانات التواصل بتفضل مخفية لحد ما يوافق الفريق وينسق المعاينة.</p></div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="results-head"><h2 style="font-size:26px;">مساحات مميزة دلوقتي</h2><a href="#/find" class="btn btn-ghost btn-sm">شوف كل الأماكن '+icon('arrow')+'</a></div>'+
+    '<div class="grid listing-grid">'+allListings().slice(0,6).map(listingCard).join('')+'</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="grid feature-split">'+
+      '<div><span class="eyebrow">Matching ذكي</span><h2 style="margin-top:14px;">مش كل عيادة مناسبة لكل دكتور</h2>'+
+      '<p class="muted" style="margin-top:12px;font-size:16px;">بنحسب نسبة توافق حقيقية بين طلبك ومواصفات كل مكان — المنطقة، الأيام، الميزانية، التخصص، والخدمات المطلوبة — عشان ما تضيّعش وقتك في معاينات مش مناسبة.</p>'+
+      '<a href="#/need-clinic" class="btn btn-primary" style="margin-top:22px;">اعمل Match دلوقتي</a></div>'+
+      '<div class="card card-pad">'+
+        '<div class="match-preview-top"><div><div style="font-weight:800;font-size:15px;">مساحة مشتركة — التجمع الخامس</div><div class="muted" style="font-size:12.5px;margin-top:3px;">تخسيس ونحت · تغذية · جلدية</div></div>'+scoreRing(92)+'</div>'+
+        '<div class="match-reasons">'+
+          '<div class="match-reason yes">'+icon('check')+' المنطقة مناسبة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' الأيام المطلوبة متاحة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' داخل الميزانية</div>'+
+          '<div class="match-reason yes">'+icon('check')+' الخدمات المطلوبة موجودة</div>'+
+          '<div class="match-reason yes">'+icon('check')+' مناسبة للتخصص</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="owners-band">'+
+      '<div><h2>مساحة فاضية = فرصة دخل ضايعة</h2>'+
+      '<div class="owners-feat">'+
+        '<div>'+icon('check')+' حوّل الغرف الفاضية لمصدر دخل شهري ثابت</div>'+
+        '<div>'+icon('check')+' استفد من الأيام والشيفتات غير المستغلة صباحًا أو مساءً</div>'+
+        '<div>'+icon('check')+' فريقنا بيتولى فلترة واختيار الدكاترة المناسبين</div>'+
+        '<div>'+icon('check')+' من غير أي تكلفة تسويق أو إدارة إضافية عليك</div>'+
+      '</div>'+
+      '<a href="#/list-space" class="btn btn-primary">اعرض عيادتك</a></div>'+
+      '<div class="owners-visual">'+icon('building')+'<h4 style="color:#fff;margin-top:14px;">مثال: عيادة فيها يومين فاضيين أسبوعيًا</h4><p class="muted" style="margin-top:8px;">ممكن تحول لدخل إضافي يقارب ٥,٠٠٠–٧,٠٠٠ ج.م شهريًا حسب المنطقة والتجهيز.</p></div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="section-head"><h2>ليه تثق في '+BRAND.name+'؟</h2></div>'+
+    '<div class="grid trust-grid">'+
+      '<div class="card trust-item">'+icon('shield')+'<p>أماكن يتم مراجعتها</p></div>'+
+      '<div class="card trust-item">'+icon('users')+'<p>بيانات الدكاترة يتم التحقق منها</p></div>'+
+      '<div class="card trust-item">'+icon('lock')+'<p>بيانات التواصل غير متاحة للعامة</p></div>'+
+      '<div class="card trust-item">'+icon('calendar')+'<p>تنسيق كامل للمعاينة</p></div>'+
+      '<div class="card trust-item">'+icon('support')+'<p>دعم لحد الاتفاق النهائي</p></div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="section-head"><h2>أسئلة شائعة</h2></div>'+
+    '<div class="card card-pad" style="max-width:760px;margin:0 auto;">'+faqAccordion(FAQ_HOME)+'</div>'+
+    '<p class="center" style="margin-top:18px;"><a href="#/faq" class="btn btn-ghost btn-sm">شوف كل الأسئلة '+icon('arrow')+'</a></p>'+
+  '</section>'+
+
+  '<section class="section container">'+
+    '<div class="final-cta">'+
+      '<h2>سواء عندك مساحة فاضية أو محتاج مكان تبدأ منه — إحنا هنساعدك تعمل الـMatch الصح.</h2>'+
+      '<div class="hero-ctas"><a href="#/need-clinic" class="btn btn-dark">بدور على عيادة</a><a href="#/list-space" class="btn btn-ghost" style="background:rgba(255,255,255,.5);">عندي مساحة</a></div>'+
+    '</div>'+
+  '</section>';
+
+  root.querySelector('#heroSearch').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = new FormData(e.target);
+    var q = [];
+    ['district','specialty','shift','budget'].forEach(function(k){ var v=f.get(k); if(v) q.push(k+'='+encodeURIComponent(v)); });
+    navigate('/find'+(q.length?'?'+q.join('&'):''));
+  });
+  bindFaqAccordion(root);
+});
+
+var FAQ_HOME = [
+  {q:'هل لازم أأجر العيادة شهر كامل؟', a:'لا، مش شرط. فيه أماكن متاحة بنظام أيام محددة في الأسبوع أو شيفت صباحي أو مسائي، وفيه أماكن تانية متاحة بس بشكل شهري كامل — بتقدر تفلتر بحسب احتياجك في صفحة "دوّر على عيادة".'},
+  {q:'هل ممكن أحجز أيام معينة فقط؟', a:'أكيد، ده جزء من فكرة المنصة الأساسية. تقدر تحدد الأيام والشيفتات اللي تناسبك بالضبط وهنرشحلك الأماكن المتوافقة معاها.'},
+  {q:'هل البيانات الشخصية بتظهر للطرف الآخر؟', a:'لا. رقم الموبايل والبريد الإلكتروني وبيانات التواصل بتفضل مخفية بين الطرفين لحد ما فريق '+BRAND.name+' يوافق على التوفيق وينسق موعد المعاينة.'},
+  {q:'إزاي بيتم الاتفاق؟', a:'بعد ما نرشحلك أفضل الأماكن، فريقنا بينسق معاينة للمكان، وبعد موافقة الطرفين بيتم التنسيق للتعاقد المباشر بينهم — المنصة بتتوسط في العملية وتساعد لحد التعاقد.'},
+  {q:'مين بيدفع العمولة؟', a:'العمولة بتُحدَّد بالتفاصيل ويتم الاتفاق عليها مع فريقنا حسب كل حالة، وبتُدفع مرة واحدة فقط بعد نجاح التوفيق وقبل إتمام التعاقد النهائي.'}
+];
+function faqAccordion(items){
+  return items.map(function(it,i){
+    return '<div class="faq-item'+(i===0?' open':'')+'"><div class="faq-q">'+esc(it.q)+icon('chev')+'</div><div class="faq-a"><p>'+esc(it.a)+'</p></div></div>';
+  }).join('');
+}
+function bindFaqAccordion(root){
+  root.querySelectorAll('.faq-q').forEach(function(q){
+    q.addEventListener('click', function(){ q.parentElement.classList.toggle('open'); });
+  });
+}
+
+/* ===================== TEMP STUBS (replaced in next pass) ===================== */
+/* ===================================================================
+   FIND A CLINIC
+   =================================================================== */
+register('find', function(root, r){
+  var state = {
+    district: r.query.district || '',
+    gov: '',
+    specialty: r.query.specialty || '',
+    budgetMin: '', budgetMax: r.query.budget || '',
+    rental: '',
+    days: [],
+    facilities: [],
+    medFacilities: [],
+    sort: 'match'
+  };
+  root.innerHTML =
+  '<div class="container page-hero">'+
+    '<div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>دوّر على عيادة</span></div>'+
+    '<h1>دوّر على عيادة تناسبك</h1><p>فلتر بحسب المنطقة والتخصص والأيام والميزانية، وهنرتبلك النتائج بالأنسب لطلبك.</p>'+
+  '</div>'+
+  '<div class="section container" style="padding-top:26px;">'+
+    '<div class="two-col">'+
+      '<div class="card filters-card" id="filtersCard">'+
+        '<div class="filter-group"><label>المحافظة</label><select id="fGov"><option value="">الكل</option>'+GOVERNORATES.map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+'</option>';}).join('')+'</select></div>'+
+        '<div class="filter-group"><label>المنطقة</label><select id="fDistrict"><option value="">كل المناطق</option>'+DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'">'+esc(d.name)+' ('+esc(d.gov)+')</option>';}).join('')+'</select></div>'+
+        '<div class="filter-group"><label>التخصص الطبي</label><select id="fSpec"><option value="">كل التخصصات</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
+        '<div class="filter-group"><label>الميزانية الشهرية (ج.م)</label><div class="budget-row"><input type="number" id="fBudgetMin" placeholder="من"><span class="muted">—</span><input type="number" id="fBudgetMax" placeholder="إلى"></div></div>'+
+        '<div class="filter-group"><label>نوع الإيجار</label><select id="fRental"><option value="">أي نوع</option>'+RENTAL_TYPES.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+'</option>';}).join('')+'</select></div>'+
+        '<div class="filter-group"><label>الأيام المتاحة</label><div class="check-grid">'+DAYS.map(function(d){return '<label class="check-row"><input type="checkbox" class="fDay" value="'+d.id+'"> '+esc(d.name)+'</label>';}).join('')+'</div></div>'+
+        '<div class="filter-group"><label>المرافق العامة</label><div class="check-grid">'+FACILITIES.map(function(f){return '<label class="check-row"><input type="checkbox" class="fFac" value="'+esc(f)+'"> '+esc(f)+'</label>';}).join('')+'</div></div>'+
+        '<div class="filter-group"><label>المرافق الطبية</label><div class="check-grid">'+MED_FACILITIES.map(function(f){return '<label class="check-row"><input type="checkbox" class="fMed" value="'+esc(f)+'"> '+esc(f)+'</label>';}).join('')+'</div></div>'+
+        '<button class="btn btn-ghost btn-block" id="fReset">إعادة ضبط الفلاتر</button>'+
+      '</div>'+
+      '<div>'+
+        '<div class="results-head"><span class="count" id="resultCount"></span>'+
+          '<select class="sort-select" id="fSort"><option value="match">الأفضل توافقًا</option><option value="price-asc">الأقل سعرًا</option><option value="newest">الأحدث</option><option value="avail">الأكثر توفرًا للأيام</option></select>'+
+        '</div>'+
+        '<div class="grid listing-grid" id="resultsGrid"></div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  document.getElementById('fDistrict').value = state.district;
+  document.getElementById('fSpec').value = state.specialty;
+  document.getElementById('fBudgetMax').value = state.budgetMax;
+  if(r.query.shift) document.getElementById('fRental').value = r.query.shift;
+
+  function readState(){
+    state.gov = document.getElementById('fGov').value;
+    state.district = document.getElementById('fDistrict').value;
+    state.specialty = document.getElementById('fSpec').value;
+    state.budgetMin = document.getElementById('fBudgetMin').value;
+    state.budgetMax = document.getElementById('fBudgetMax').value;
+    state.rental = document.getElementById('fRental').value;
+    state.sort = document.getElementById('fSort').value;
+    state.days = Array.prototype.map.call(root.querySelectorAll('.fDay:checked'), function(c){return c.value;});
+    state.facilities = Array.prototype.map.call(root.querySelectorAll('.fFac:checked'), function(c){return c.value;});
+    state.medFacilities = Array.prototype.map.call(root.querySelectorAll('.fMed:checked'), function(c){return c.value;});
+  }
+  function apply(){
+    readState();
+    var items = allListings().filter(function(l){
+      if(state.gov && l.gov!==state.gov) return false;
+      if(state.district && l.district!==state.district) return false;
+      if(state.specialty && l.specialties.indexOf(state.specialty)===-1) return false;
+      if(state.budgetMin && l.price < Number(state.budgetMin)) return false;
+      if(state.budgetMax && l.price > Number(state.budgetMax)) return false;
+      if(state.rental && ['morning','evening','full','flex'].indexOf(state.rental)!==-1 && l.shift!==state.rental) return false;
+      if(state.days.length && !state.days.some(function(d){return l.days.indexOf(d)!==-1;})) return false;
+      if(state.facilities.length && !state.facilities.every(function(f){return l.facilities.indexOf(f)!==-1;})) return false;
+      if(state.medFacilities.length && !state.medFacilities.every(function(f){return l.medFacilities.indexOf(f)!==-1;})) return false;
+      return true;
+    });
+    var req = {district:state.district, gov:state.gov, specialty:state.specialty, budgetMax:state.budgetMax, days:state.days, facilities:state.facilities.concat(state.medFacilities)};
+    var scored = items.map(function(l){ return computeMatch(req,l); });
+    if(state.sort==='match') scored.sort(function(a,b){return b.score-a.score;});
+    else if(state.sort==='price-asc') scored.sort(function(a,b){return a.listing.price-b.listing.price;});
+    else if(state.sort==='newest') scored.reverse();
+    else if(state.sort==='avail') scored.sort(function(a,b){return b.listing.days.length-a.listing.days.length;});
+    var grid = document.getElementById('resultsGrid');
+    document.getElementById('resultCount').textContent = scored.length + ' مكان متاح';
+    if(!scored.length){
+      grid.innerHTML = '<div class="empty-state card" style="grid-column:1/-1;">'+icon('search')+'<h3>مفيش نتائج مطابقة</h3><p>جرب توسّع نطاق الفلاتر، أو قدّم طلبك واحنا هنبحث لك.</p><a href="#/need-clinic" class="btn btn-primary btn-sm" style="margin-top:14px;">قدّم طلب دلوقتي</a></div>';
+      return;
+    }
+    grid.innerHTML = scored.map(function(m){ return listingCard(m.listing); }).join('');
+  }
+  root.querySelectorAll('#fGov,#fDistrict,#fSpec,#fBudgetMin,#fBudgetMax,#fRental,#fSort').forEach(function(el){ el.addEventListener('change', apply); });
+  root.querySelectorAll('.fDay,.fFac,.fMed').forEach(function(el){ el.addEventListener('change', apply); });
+  document.getElementById('fReset').addEventListener('click', function(){
+    root.querySelectorAll('#filtersCard select').forEach(function(s){ s.value=''; });
+    root.querySelectorAll('#filtersCard input[type=checkbox]').forEach(function(c){ c.checked=false; });
+    root.querySelectorAll('#filtersCard input[type=number]').forEach(function(i){ i.value=''; });
+    apply();
+  });
+  apply();
+});
+
+/* ===================================================================
+   CLINIC DETAILS
+   =================================================================== */
+register('clinic', function(root, r){
+  var id = r.seg[1];
+  var l = findListing(id);
+  if(!l){
+    root.innerHTML = '<div class="section container empty-state">'+icon('info')+'<h3>المكان غير موجود</h3><p>يمكن يكون الرابط غير صحيح.</p><a href="#/find" class="btn btn-primary btn-sm" style="margin-top:14px;">رجوع للبحث</a></div>';
+    return;
+  }
+  var similar = allListings().filter(function(x){ return x.id!==l.id && (x.district===l.district || x.specialties.some(function(s){return l.specialties.indexOf(s)!==-1;})); }).slice(0,3);
+  var verifiedBadge = l.verified ? '<span class="badge-verified">'+icon('shield')+' موثّقة من فريقنا</span>' : '<span class="badge-pending">'+icon('clockx')+' قيد المراجعة والتحقق</span>';
+  root.innerHTML =
+  '<div class="section container" style="padding-top:26px;">'+
+    '<div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <a href="#/find">دوّر على عيادة</a> '+icon('chev')+' <span>'+esc(l.title)+'</span></div>'+
+    '<div class="gallery-grid">'+
+      '<div class="g-tile g-main">'+icon('building')+'<span>صور تعريفية للمساحة — الصور الحقيقية تُضاف بعد المراجعة</span></div>'+
+      '<div class="gallery-stack"><div class="g-tile">'+icon('bed')+'<span>غرفة الكشف</span></div><div class="g-tile">'+icon('users')+'<span>صالة الانتظار</span></div></div>'+
+    '</div>'+
+    '<div class="details-layout">'+
+      '<div>'+
+        '<div class="flex" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-top:22px;">'+
+          '<div><span class="chip chip-teal">'+esc(l.type)+'</span><h1 style="margin-top:12px;">'+esc(l.title)+'</h1>'+
+          '<div class="listing-loc" style="margin-top:8px;">'+icon('pin')+esc(l.district)+' — '+esc(l.gov)+'</div></div>'+
+          verifiedBadge+
+        '</div>'+
+        '<div class="district-note" style="margin-top:18px;">'+icon('lock')+' <span>بيتم عرض المنطقة أو الحي فقط للحفاظ على خصوصية المكان. العنوان التفصيلي بيتشارك بعد موافقة الطرفين وتنسيق فريقنا للمعاينة.</span></div>'+
+        '<div class="card card-pad" style="margin-top:22px;"><h4 style="font-size:16px;margin-bottom:12px;">وصف المساحة</h4><p class="muted">'+esc(l.desc)+'</p></div>'+
+        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">التخصصات المناسبة</h4><div class="spec-row">'+l.specialties.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join('')+'</div></div>'+
+        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">الأيام المتاحة والشيفت</h4><div class="avail-strip">'+DAYS.map(function(d){return '<div class="day-pill'+(l.days.indexOf(d.id)!==-1?' on':'')+'">'+esc(d.short)+'</div>';}).join('')+'</div><p class="muted" style="margin-top:12px;">الشيفت: '+shiftName(l.shift)+'</p></div>'+
+        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">المرافق العامة</h4><div class="facility-grid">'+l.facilities.map(function(f){return '<div class="facility-item">'+icon('check')+esc(f)+'</div>';}).join('')+'</div></div>'+
+        '<div class="card card-pad" style="margin-top:16px;">'+
+          '<h4 style="font-size:16px;margin-bottom:12px;">المرافق والتجهيزات الطبية</h4>'+
+          (l.medFacilities.length ? '<div class="facility-grid">'+l.medFacilities.map(function(f){return '<div class="facility-item">'+icon('check')+esc(f)+'</div>';}).join('')+'</div>' : '<p class="muted">لا توجد تجهيزات طبية إضافية مذكورة — تقدر تتفق على التجهيز المطلوب مباشرة مع صاحب المكان بعد التنسيق.</p>')+
+        '</div>'+
+      '</div>'+
+      '<div class="sticky-side">'+
+        '<div class="card card-pad">'+
+          '<div class="listing-price" style="font-size:22px;">'+l.price.toLocaleString('en-US')+' <span>ج.م / شهريًا</span></div>'+
+          '<p class="muted" style="font-size:13px;margin-top:6px;">السعر تقريبي ونهائيًا بيتحدد حسب الأيام والشيفت المطلوب.</p>'+
+          '<button class="btn btn-primary btn-block" style="margin-top:16px;" id="interestBtn">أنا مهتم بالمكان ده</button>'+
+          '<div id="interestForm" hidden style="margin-top:16px;display:grid;gap:10px;">'+
+            '<div class="field"><input type="text" id="intName" placeholder="اسمك بالكامل"></div>'+
+            '<div class="field"><input type="tel" id="intPhone" placeholder="رقم الموبايل"></div>'+
+            '<div class="field"><select id="intSpec"><option value="">تخصصك الطبي</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
+            '<button class="btn btn-dark btn-block" id="intSubmit">إرسال طلب الاهتمام</button>'+
+            '<p class="hint" style="text-align:center;">هيتواصل معاك فريقنا لتنسيق المعاينة — رقمك وبياناتك متاحة لفريقنا فقط.</p>'+
+          '</div>'+
+          '<div id="interestDone" hidden style="margin-top:16px;text-align:center;">'+icon('check')+'<p style="font-weight:700;margin-top:8px;">تم إرسال طلبك بنجاح ✔</p><p class="muted" style="font-size:13px;margin-top:6px;">هيتواصل معاك فريقنا خلال ٤٨ ساعة لتنسيق المعاينة.</p></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    (similar.length ? '<div style="margin-top:44px;"><h3 style="font-size:20px;margin-bottom:18px;">أماكن مشابهة</h3><div class="grid listing-grid">'+similar.map(listingCard).join('')+'</div></div>' : '')+
+  '</div>';
+
+  document.getElementById('interestBtn').addEventListener('click', function(){
+    document.getElementById('interestForm').hidden = false;
+    this.hidden = true;
+  });
+  document.getElementById('intSubmit').addEventListener('click', function(){
+    var name = document.getElementById('intName').value.trim();
+    var phone = document.getElementById('intPhone').value.trim();
+    if(!name || !phone){ toast('من فضلك اكتب اسمك ورقم موبايلك'); return; }
+    var btn = document.getElementById('intSubmit');
+    btn.disabled = true;
+    supaInsert('interests', {listing_id:l.id, name:name, phone:phone, specialty:document.getElementById('intSpec').value}).then(function(){
+      document.getElementById('interestForm').hidden = true;
+      document.getElementById('interestDone').hidden = false;
+    }).catch(function(){
+      btn.disabled = false;
+      toast('حصل خطأ في الإرسال، حاول تاني.');
+    });
+  });
+});
+/* ===================== small form helpers ===================== */
+function fieldWrap(id, labelText, inputHtml, hint){
+  return '<div class="field" id="wrap_'+id+'"><label for="'+id+'">'+labelText+'</label>'+inputHtml+(hint?'<div class="hint">'+hint+'</div>':'')+'<div class="err">مطلوب تعبئة هذا الحقل</div></div>';
+}
+function checkGroup(name, options, cols){
+  return '<div class="check-grid" style="grid-template-columns:repeat('+(cols||2)+',1fr);">'+options.map(function(o){
+    var val = typeof o==='string'?o:o.id, lab = typeof o==='string'?o:o.name;
+    return '<label class="check-row"><input type="checkbox" class="grp-'+name+'" value="'+esc(val)+'"> '+esc(lab)+'</label>';
+  }).join('')+'</div>';
+}
+function getChecked(root, cls){ return Array.prototype.map.call(root.querySelectorAll('.'+cls+':checked'), function(c){return c.value;}); }
+function markInvalid(id, bad){ var w=document.getElementById('wrap_'+id); if(w) w.classList.toggle('invalid', !!bad); }
+function districtOptions(){ return DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'" data-gov="'+esc(d.gov)+'">'+esc(d.name)+' ('+esc(d.gov)+')</option>';}).join(''); }
+
+/* ===================================================================
+   LIST YOUR SPACE (space owner intake)
+   =================================================================== */
+register('list-space', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>عندي مساحة</span></div>'+
+  '<h1>عندك عيادة أو غرفة مش مستغلة بالكامل؟</h1><p>سجّل بيانات المساحة، وفريقنا هيراجعها ويبدأ يرشحلك دكاترة مناسبين لأيامك الفاضية.</p></div>'+
+  '<div class="section container" id="formSection">'+
+    '<div class="card form-card">'+
+      '<form id="spaceForm" novalidate>'+
+        '<div class="form-grid">'+
+          fieldWrap('ownerName','اسمك بالكامل','<input id="ownerName" type="text" placeholder="مثال: د. أحمد سامي">')+
+          fieldWrap('ownerPhone','رقم الموبايل','<input id="ownerPhone" type="tel" placeholder="01xxxxxxxxx">','هيُستخدم فقط للتواصل من فريقنا، ولن يظهر للعامة')+
+          fieldWrap('ownerEmail','البريد الإلكتروني (اختياري)','<input id="ownerEmail" type="email" placeholder="name@example.com">')+
+          fieldWrap('ownerGov','المحافظة','<select id="ownerGov"><option value="">اختر المحافظة</option>'+GOVERNORATES.map(function(g){return '<option>'+esc(g)+'</option>';}).join('')+'</select>')+
+          fieldWrap('ownerDistrict','المنطقة','<select id="ownerDistrict"><option value="">اختر المنطقة</option>'+districtOptions()+'</select>')+
+          fieldWrap('ownerType','نوع المكان','<select id="ownerType"><option value="">اختر النوع</option>'+CLINIC_TYPES.map(function(t){return '<option>'+esc(t)+'</option>';}).join('')+'</select>')+
+          fieldWrap('ownerShift','الفترة / الشيفت','<select id="ownerShift"><option value="">اختر الفترة</option>'+SHIFTS.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>';}).join('')+'</select>')+
+          fieldWrap('ownerPrice','السعر الشهري المطلوب (ج.م)','<input id="ownerPrice" type="number" placeholder="مثال: 5000">')+
+        '</div>'+
+        '<div class="field field-full" id="wrap_ownerSpecs" style="margin-top:16px;"><label>التخصصات المناسبة للمكان</label>'+checkGroup('spec',SPECIALTIES,3)+'<div class="err">اختار تخصص واحد على الأقل</div></div>'+
+        '<div class="field field-full" id="wrap_ownerDays" style="margin-top:16px;"><label>الأيام المتاحة</label>'+checkGroup('days',DAYS,4)+'<div class="err">اختار يوم واحد على الأقل</div></div>'+
+        '<div class="field field-full" style="margin-top:16px;"><label>المرافق العامة المتوفرة</label>'+checkGroup('fac',FACILITIES,3)+'</div>'+
+        '<div class="field field-full" style="margin-top:16px;"><label>المرافق والتجهيزات الطبية المتوفرة</label>'+checkGroup('med',MED_FACILITIES,3)+'</div>'+
+        '<div class="field field-full" id="wrap_ownerDesc" style="margin-top:16px;">'+fieldWrap('ownerDesc','وصف مختصر للمساحة','<textarea id="ownerDesc" placeholder="اكتب وصف قصير عن المكان، الموقع، والتجهيزات..."></textarea>')+'</div>'+
+        '<label class="check-inline" style="margin-top:16px;"><input type="checkbox" id="ownerAgree"> موافق على <a href="#/terms" style="color:var(--teal-dark);text-decoration:underline;">الشروط والأحكام</a> وعلى إن '+BRAND.name+' تتوسط في عملية التوفيق كطرف وسيط فقط.</label>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary">اعرض مساحتك</button></div>'+
+      '</form>'+
+    '</div>'+
+  '</div>';
+
+  root.querySelector('#spaceForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var name=document.getElementById('ownerName').value.trim();
+    var phone=document.getElementById('ownerPhone').value.trim();
+    var gov=document.getElementById('ownerGov').value;
+    var district=document.getElementById('ownerDistrict').value;
+    var type=document.getElementById('ownerType').value;
+    var shift=document.getElementById('ownerShift').value;
+    var price=document.getElementById('ownerPrice').value;
+    var desc=document.getElementById('ownerDesc').value.trim();
+    var specs=getChecked(root,'grp-spec');
+    var days=getChecked(root,'grp-days');
+    var agree=document.getElementById('ownerAgree').checked;
+    var ok=true;
+    function chk(cond,id){ markInvalid(id,!cond); if(!cond) ok=false; }
+    chk(name.length>1,'ownerName'); chk(phone.length>=8,'ownerPhone'); chk(gov,'ownerGov'); chk(district,'ownerDistrict');
+    chk(type,'ownerType'); chk(shift,'ownerShift'); chk(price && Number(price)>0,'ownerPrice'); chk(desc.length>4,'ownerDesc');
+    chk(specs.length>0,'ownerSpecs'); chk(days.length>0,'ownerDays');
+    if(!agree){ toast('لازم توافق على الشروط والأحكام أولًا'); ok=false; }
+    if(!ok){ var firstInvalid=root.querySelector('.field.invalid'); if(firstInvalid) firstInvalid.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+    var code = genCode('CS-OWN');
+    var listing = {
+      id:'u_'+Date.now(), title:(type||'مساحة طبية')+' — '+district, district:district, gov:gov, type:type,
+      specialties:specs, days:days, shift:shift, price:Number(price),
+      facilities:getChecked(root,'grp-fac'), med_facilities:getChecked(root,'grp-med'),
+      verified:false, description:desc, owner_name:name, owner_phone:phone, owner_email:document.getElementById('ownerEmail').value.trim(),
+      tracking_code:code, status:'قيد المراجعة'
+    };
+    var submitBtn = root.querySelector('#spaceForm button[type=submit]');
+    if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
+    supaInsert('listings', listing).then(function(){
+      ensureListings(true);
+      document.getElementById('formSection').innerHTML =
+        '<div class="card success-box">'+icon('check')+
+        '<h2 style="margin-top:14px;">تم استلام بيانات مساحتك!</h2>'+
+        '<p class="muted" style="margin-top:10px;">فريقنا هيراجع البيانات ويتحقق منها خلال ٤٨ ساعة، وبعدها هتبدأ تستقبل ترشيحات دكاترة مناسبين.</p>'+
+        '<div class="code-pill">'+code+'</div>'+
+        '<p class="hint" style="margin-bottom:18px;">احتفظ بالكود ده — هتستخدمه للدخول على لوحة تحكم المساحة بتاعتك.</p>'+
+        '<div class="hero-ctas" style="justify-content:center;"><a href="#/dashboard-owner?code='+code+'" class="btn btn-primary">روح لوحة التحكم</a><a href="#/" class="btn btn-ghost">الرئيسية</a></div>'+
+        '</div>';
+      window.scrollTo(0,0);
+    }).catch(function(){
+      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='اعرض مساحتك'; }
+      toast('حصل خطأ في إرسال البيانات، حاول تاني.');
+    });
+  });
+});
+
+/* ===================================================================
+   I NEED A CLINIC (doctor demand intake)
+   =================================================================== */
+register('need-clinic', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>بدور على عيادة</span></div>'+
+  '<h1>اشتغل من عيادة مجهزة في المكان والأيام اللي تناسبك</h1><p>سجّل طلبك وهنرشحلك فورًا أقرب الأماكن المتاحة حسب تخصصك وميزانيتك.</p></div>'+
+  '<div class="section container" id="formSection">'+
+    '<div class="card form-card">'+
+      '<form id="needForm" novalidate>'+
+        '<div class="form-grid">'+
+          fieldWrap('drName','اسمك بالكامل','<input id="drName" type="text" placeholder="مثال: د. مروة عادل">')+
+          fieldWrap('drPhone','رقم الموبايل','<input id="drPhone" type="tel" placeholder="01xxxxxxxxx">','هيُستخدم فقط للتواصل من فريقنا')+
+          fieldWrap('drEmail','البريد الإلكتروني (اختياري)','<input id="drEmail" type="email" placeholder="name@example.com">')+
+          fieldWrap('drSpec','تخصصك الطبي','<select id="drSpec"><option value="">اختر التخصص</option>'+SPECIALTIES.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select>')+
+          fieldWrap('drGov','المحافظة المفضلة','<select id="drGov"><option value="">أي محافظة</option>'+GOVERNORATES.map(function(g){return '<option>'+esc(g)+'</option>';}).join('')+'</select>')+
+          fieldWrap('drDistrict','المنطقة المفضلة','<select id="drDistrict"><option value="">أي منطقة</option>'+districtOptions()+'</select>')+
+          fieldWrap('drRental','نوع الإيجار المطلوب','<select id="drRental"><option value="">اختر النوع</option>'+RENTAL_TYPES.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+'</option>';}).join('')+'</select>')+
+          fieldWrap('drBudget','الميزانية الشهرية القصوى (ج.م)','<input id="drBudget" type="number" placeholder="مثال: 6000">')+
+        '</div>'+
+        '<div class="field field-full" id="wrap_drDays" style="margin-top:16px;"><label>الأيام المطلوبة</label>'+checkGroup('rdays',DAYS,4)+'<div class="err">اختار يوم واحد على الأقل، أو سيبها فاضية لو مرن</div></div>'+
+        '<div class="field field-full" style="margin-top:16px;"><label>الخدمات والمرافق المطلوبة</label>'+checkGroup('rfac',FACILITIES.concat(MED_FACILITIES),3)+'</div>'+
+        '<div class="field field-full" style="margin-top:16px;">'+fieldWrap('drNotes','ملاحظات إضافية (اختياري)','<textarea id="drNotes" placeholder="أي تفاصيل تانية تساعدنا نرشحلك مكان أدق..."></textarea>')+'</div>'+
+        '<label class="check-inline" style="margin-top:6px;"><input type="checkbox" id="drAgree"> موافق على <a href="#/terms" style="color:var(--teal-dark);text-decoration:underline;">الشروط والأحكام</a> وعلى إن '+BRAND.name+' تتوسط في عملية التوفيق كطرف وسيط فقط.</label>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary">شوف الأماكن المناسبة</button></div>'+
+      '</form>'+
+    '</div>'+
+  '</div>';
+
+  root.querySelector('#needForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var name=document.getElementById('drName').value.trim();
+    var phone=document.getElementById('drPhone').value.trim();
+    var spec=document.getElementById('drSpec').value;
+    var agree=document.getElementById('drAgree').checked;
+    var ok=true;
+    function chk(cond,id){ markInvalid(id,!cond); if(!cond) ok=false; }
+    chk(name.length>1,'drName'); chk(phone.length>=8,'drPhone'); chk(spec,'drSpec');
+    if(!agree){ toast('لازم توافق على الشروط والأحكام أولًا'); ok=false; }
+    if(!ok){ var firstInvalid=root.querySelector('.field.invalid'); if(firstInvalid) firstInvalid.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+    var code = genCode('CS-DOC');
+    var budgetVal = document.getElementById('drBudget').value;
+    budgetVal = budgetVal ? Number(budgetVal) : null;
+    var days = getChecked(root,'grp-rdays');
+    var facilities = getChecked(root,'grp-rfac');
+    var email = document.getElementById('drEmail').value.trim();
+    var gov = document.getElementById('drGov').value;
+    var district = document.getElementById('drDistrict').value;
+    var rental = document.getElementById('drRental').value;
+    var notes = document.getElementById('drNotes').value.trim();
+    var reqObj = {
+      id:'r_'+Date.now(), name:name, phone:phone, email:email,
+      specialty:spec, gov:gov, district:district,
+      rental:rental, budget_max:budgetVal,
+      days:days, facilities:facilities,
+      notes:notes, tracking_code:code, status:'قيد المراجعة'
+    };
+    var submitBtn = root.querySelector('#needForm button[type=submit]');
+    if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
+    supaInsert('requests', reqObj).then(function(){
+      try{ sessionStorage.setItem('cs_last_request', JSON.stringify({
+        name:name, phone:phone, email:email, specialty:spec, gov:gov, district:district,
+        rental:rental, budgetMax:budgetVal, days:days, facilities:facilities,
+        notes:notes, trackingCode:code, status:'قيد المراجعة'
+      })); }catch(err){}
+      navigate('/matches?code='+code);
+    }).catch(function(){
+      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='شوف الأماكن المناسبة'; }
+      toast('حصل خطأ في إرسال البيانات، حاول تاني.');
+    });
+  });
+});
+
+/* ===================================================================
+   MATCHING RESULTS
+   =================================================================== */
+register('matches', async function(root, r){
+  var req = null, isDemo = false;
+  var code = r.query.code;
+  if(code){
+    try{
+      var lookupRes = await callApi('lookup_by_code', {code:code});
+      if(lookupRes && lookupRes.type==='doctor' && lookupRes.row) req = normalizeRequestRow(lookupRes.row);
+    }catch(e){}
+  }
+  if(!req){
+    try{ var last = sessionStorage.getItem('cs_last_request'); if(last) req = JSON.parse(last); }catch(e){}
+  }
+  if(!req){
+    isDemo = true;
+    req = {name:'', specialty:'باطنة', gov:'', district:'', budgetMax:'7000', days:['sat','mon','wed'], facilities:['استقبال','واي فاي','تكييف']};
+  }
+  var matches = topMatches(req, 6).filter(function(m){ return m.score>0; });
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>نتائج المطابقة</span></div>'+
+  '<h1>أفضل الأماكن المتاحة ليك دلوقتي</h1>'+
+  (isDemo ?
+    '<div class="legal-note" style="margin-top:16px;">'+icon('info')+' دي نتيجة توضيحية بمواصفات افتراضية (تخصص باطنة، ميزانية حتى ٧,٠٠٠ ج.م). <a href="#/need-clinic" style="text-decoration:underline;">قدّم طلبك الحقيقي دلوقتي</a> لنتيجة مخصصة ليك.</div>'
+  : '<p>طلبك رقم <b>'+esc(req.trackingCode||'')+'</b> تحت المراجعة، وده أفضل الأماكن المتاحة حاليًا حسب بياناتك.</p>')+
+  '</div>'+
+  '<div class="section container" style="padding-top:10px;">'+
+    (matches.length ? '<div class="grid" style="gap:16px;">'+matches.map(function(m){ return matchCard(m); }).join('')+'</div>' :
+      '<div class="empty-state card">'+icon('search')+'<h3>لسه مفيش أماكن مطابقة كفاية</h3><p>هنكمل نبحث لك ونضيف أماكن جديدة قريب.</p></div>')+
+    '<div class="center" style="margin-top:30px;"><a href="#/need-clinic" class="btn btn-ghost">قدّم طلب جديد</a></div>'+
+  '</div>';
+
+  root.querySelectorAll('[data-int]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var lid = btn.getAttribute('data-int');
+      btn.disabled = true;
+      supaInsert('interests', {listing_id:lid, name:req.name||'', phone:req.phone||'', specialty:req.specialty||''}).then(function(){
+        btn.textContent = 'تم إرسال الاهتمام ✔';
+      }).catch(function(){
+        btn.disabled = false;
+        toast('حصل خطأ، حاول تاني.');
+      });
+    });
+  });
+});
+function matchCard(m){
+  var l = m.listing;
+  return '<div class="card match-card">'+
+    scoreRing(m.score)+
+    '<div><div class="listing-title">'+esc(l.title)+'</div>'+
+    '<div class="listing-loc" style="margin-top:4px;">'+icon('pin')+esc(l.district)+' — '+esc(l.gov)+'</div>'+
+    '<div class="match-reasons" style="grid-template-columns:1fr 1fr;display:grid;margin-top:12px;">'+m.reasons.map(function(rs){
+      return '<div class="match-reason '+(rs.pass?'yes':'no')+'">'+icon(rs.pass?'check':'x')+' '+esc(rs.label)+'</div>';
+    }).join('')+'</div></div>'+
+    '<div style="text-align:center;"><div class="listing-price">'+l.price.toLocaleString('en-US')+'<span> ج.م/شهريًا</span></div>'+
+    '<a href="#/clinic/'+l.id+'" class="btn btn-ghost btn-sm" style="margin-top:10px;">التفاصيل</a>'+
+    '<button class="btn btn-primary btn-sm btn-block" style="margin-top:8px;" data-int="'+l.id+'">أنا مهتم</button></div>'+
+  '</div>';
+}
+/* ===================================================================
+   HOW IT WORKS
+   =================================================================== */
+register('how-it-works', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>إزاي بتشتغل</span></div>'+
+  '<h1>إزاي بتشتغل '+BRAND.name+'؟</h1><p>العملية بسيطة ومنظمة، وفريقنا بيكون موجود في كل خطوة لحد ما يتم التوفيق الصحيح.</p></div>'+
+  '<div class="section container">'+
+    '<div class="grid steps-grid">'+
+      '<div class="card step-card"><div class="step-num">١</div><h4>قولنا محتاج إيه</h4><p>سجّل بيانات طلبك أو مساحتك بالتفاصيل المطلوبة.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٢</div><h4>بنراجع طلبك</h4><p>فريقنا بيتحقق من البيانات ويتواصل معاك لو محتاجين أي تفاصيل إضافية.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٣</div><h4>بنرشحلك أفضل Match</h4><p>خوارزمية المطابقة بتقارن طلبك بكل الأماكن المتاحة وترشحلك الأنسب.</p></div>'+
+      '<div class="card step-card"><div class="step-num">٤</div><h4>ننسق المعاينة والتعاقد</h4><p>لو الطرفين موافقين، بننسق معاينة، وبعدها التعاقد المباشر بينكم.</p></div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="section container">'+
+    '<div class="grid journey-grid">'+
+      '<div class="card journey-card doctor">'+
+        '<div class="icon-wrap" style="background:rgba(20,184,166,.16);">'+icon('doctor')+'</div>'+
+        '<h3 style="margin-top:16px;">رحلة الدكتور</h3>'+
+        '<ul class="journey-list">'+
+          '<li>'+icon('check')+' يسجّل طلبه بالتخصص والمنطقة والأيام والميزانية</li>'+
+          '<li>'+icon('check')+' يستقبل نتائج Matching فورية بنسبة توافق</li>'+
+          '<li>'+icon('check')+' يرسل "أنا مهتم" للمكان المناسب</li>'+
+          '<li>'+icon('check')+' فريقنا يراجع ويرسل بياناته لصاحب المكان بعد الموافقة</li>'+
+          '<li>'+icon('check')+' معاينة منسّقة، وبعدها التعاقد المباشر</li>'+
+        '</ul>'+
+        '<a href="#/need-clinic" class="btn btn-primary btn-block">ابدأ طلبك</a>'+
+      '</div>'+
+      '<div class="card journey-card owner">'+
+        '<div class="icon-wrap">'+icon('building')+'</div>'+
+        '<h3 style="margin-top:16px;">رحلة صاحب المساحة</h3>'+
+        '<ul class="journey-list">'+
+          '<li>'+icon('check')+' يسجّل بيانات المكان والأيام والسعر</li>'+
+          '<li>'+icon('check')+' فريقنا يراجع البيانات ويضيف "علامة موثّقة" بعد التحقق</li>'+
+          '<li>'+icon('check')+' يستقبل طلبات اهتمام من دكاترة مناسبين للتخصص والأيام</li>'+
+          '<li>'+icon('check')+' يراجع الطلبات من لوحة تحكمه</li>'+
+          '<li>'+icon('check')+' يوافق على معاينة، وبعدها التعاقد المباشر</li>'+
+        '</ul>'+
+        '<a href="#/list-space" class="btn btn-dark btn-block">اعرض مساحتك</a>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="section container center">'+
+    '<h2 style="font-size:24px;">لسه عندك أسئلة؟</h2>'+
+    '<a href="#/faq" class="btn btn-ghost" style="margin-top:16px;">شوف الأسئلة الشائعة</a>'+
+  '</div>';
+});
+
+/* ===================================================================
+   ABOUT US
+   =================================================================== */
+register('about', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>من نحن</span></div>'+
+  '<h1>إحنا فريق '+BRAND.name+'</h1><p>منصة مصرية بتحل مشكلة حقيقية في سوق العيادات الطبية.</p></div>'+
+  '<div class="section container">'+
+    '<div class="legal-content">'+
+      '<h3>قصتنا</h3>'+
+      '<p>بدأت '+BRAND.name+' من ملاحظة بسيطة: عيادات كتير في مصر فيها أيام أو شيفتات كاملة غير مستغلة، في نفس الوقت اللي فيه دكاترة كتير — خصوصًا في بداية مشوارهم أو اللي بيدوروا على مكان تجريبي — مضطرين يدفعوا تكلفة عيادة كاملة أو يفضلوا بدون مكان مناسب لشغلهم.</p>'+
+      '<p style="margin-top:12px;">قررنا نبني منصة "Matching" متخصصة، مش موقع إعلانات عقارية عادي، بتفهم احتياجات كل طرف بالتفصيل — التخصص، الأيام، الميزانية، والتجهيزات — وتوصله بأنسب فرصة.</p>'+
+      '<h3>مهمتنا</h3>'+
+      '<p>نساعد كل عيادة تستغل مساحتها بالكامل، ونساعد كل دكتور يلاقي مكان يبدأ أو يوسّع بيه شغله من غير عبء تكلفة عيادة كاملة.</p>'+
+      '<h3>قيمنا</h3>'+
+      '<ul><li><b>الشفافية:</b> بيانات واضحة عن كل مكان، وعلامة "موثّقة" فقط للأماكن اللي بنراجعها فعليًا.</li>'+
+      '<li><b>الخصوصية:</b> بيانات التواصل بتفضل مخفية بين الطرفين لحد ما يوافق فريقنا.</li>'+
+      '<li><b>الجدية:</b> بنركز على توفيق حقيقي بيوصل لتعاقد، مش أعداد إعلانات بس.</li></ul>'+
+      '<h3>لسه في أول الطريق</h3>'+
+      '<p>'+BRAND.name+' لسه نسخة MVP تجريبية بنستخدمها لفهم احتياجات السوق المصري بشكل أدق قبل الإطلاق الكامل — فلو عندك ملاحظة أو اقتراح، تواصل معنا في أي وقت.</p>'+
+    '</div>'+
+  '</div>'+
+  '<div class="section container center">'+
+    '<div class="final-cta"><h2>عايز تكون من أول المستخدمين؟</h2>'+
+    '<div class="hero-ctas"><a href="#/need-clinic" class="btn btn-dark">بدور على عيادة</a><a href="#/list-space" class="btn btn-ghost" style="background:rgba(255,255,255,.5);">عندي مساحة</a></div></div>'+
+  '</div>';
+});
+
+/* ===================================================================
+   FAQ
+   =================================================================== */
+var FAQ_FULL = FAQ_HOME.concat([
+  {q:'هل كل العيادات مجهزة بالكامل؟', a:'لا، بتختلف من مكان لمكان. كل إعلان بيوضح المرافق العامة والتجهيزات الطبية المتاحة بالتفصيل، وممكن تفلتر في صفحة "دوّر على عيادة" على المرافق اللي محتاجها بالضبط.'},
+  {q:'هل '+BRAND.name+' طرف في عقد الإيجار؟', a:'لا، '+BRAND.name+' وسيط للتوفيق بين الطرفين فقط ولا تُعتبر طرفًا في عقد الإيجار أو الاستخدام النهائي. العقد بيتم مباشرة بين الدكتور وصاحب المكان بعد التنسيق.'},
+  {q:'هل ممكن أعرض أكتر من غرفة أو مكان؟', a:'أكيد، تقدر تسجّل أكتر من مساحة، وكل مكان بيكون له بيانات وحالة مراجعة مستقلة في لوحة تحكمك.'},
+  {q:'هل ممكن أغيّر الأيام المتاحة بعد النشر؟', a:'نعم، تقدر تحدّث الأيام والشيفتات المتاحة في أي وقت من لوحة تحكم صاحب المساحة، أو بالتواصل مباشرة مع فريق الدعم.'}
+]);
+register('faq', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>الأسئلة الشائعة</span></div>'+
+  '<h1>الأسئلة الشائعة</h1><p>كل اللي محتاج تعرفه عن '+BRAND.name+' قبل ما تبدأ.</p></div>'+
+  '<div class="section container"><div class="card card-pad" style="max-width:760px;margin:0 auto;">'+faqAccordion(FAQ_FULL)+'</div>'+
+  '<p class="center muted" style="margin-top:26px;">لسه عندك سؤال؟ <a href="#/contact" style="color:var(--teal-dark);text-decoration:underline;">تواصل معانا</a>.</p></div>';
+  bindFaqAccordion(root);
+});
+
+/* ===================================================================
+   CONTACT
+   =================================================================== */
+register('contact', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>تواصل معنا</span></div>'+
+  '<h1>تواصل معنا</h1><p>عندك سؤال أو اقتراح أو محتاج مساعدة؟ إحنا هنا.</p></div>'+
+  '<div class="section container">'+
+    '<div class="grid contact-split">'+
+      '<div class="grid" style="gap:14px;">'+
+        '<div class="card card-pad flex" style="align-items:center;gap:14px;"><div class="icon-wrap">'+icon('mail')+'</div><div><div style="font-weight:800;">البريد الإلكتروني</div><div class="muted" style="font-size:13.5px;">'+BRAND.supportEmail+' (مثال تجريبي)</div></div></div>'+
+        '<div class="card card-pad flex" style="align-items:center;gap:14px;"><div class="icon-wrap">'+icon('phone')+'</div><div><div style="font-weight:800;">الموبايل / واتساب</div><div class="muted" style="font-size:13.5px;">'+BRAND.supportPhone+' (مثال تجريبي)</div></div></div>'+
+        '<div class="card card-pad flex" style="align-items:center;gap:14px;"><div class="icon-wrap">'+icon('pin')+'</div><div><div style="font-weight:800;">نطاق العمل</div><div class="muted" style="font-size:13.5px;">القاهرة الكبرى — في تطور مستمر</div></div></div>'+
+      '</div>'+
+      '<div class="card form-card" style="margin:0;padding:28px;" id="contactFormCard">'+
+        '<form id="contactForm" novalidate>'+
+          '<div class="form-grid">'+
+            fieldWrap('cName','الاسم','<input id="cName" type="text">')+
+            fieldWrap('cContact','الموبايل أو البريد الإلكتروني','<input id="cContact" type="text">')+
+          '</div>'+
+          '<div class="field field-full" style="margin-top:16px;">'+fieldWrap('cSubject','الموضوع','<select id="cSubject"><option value="">اختر الموضوع</option><option>استفسار عام</option><option>مشكلة في طلب مسجّل</option><option>شراكة أو تعاون</option><option>ملاحظات على المنصة</option></select>')+'</div>'+
+          '<div class="field field-full" style="margin-top:16px;">'+fieldWrap('cMsg','رسالتك','<textarea id="cMsg" placeholder="اكتب رسالتك هنا..."></textarea>')+'</div>'+
+          '<div class="form-actions"><button type="submit" class="btn btn-primary">إرسال الرسالة</button></div>'+
+        '</form>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  root.querySelector('#contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var name=document.getElementById('cName').value.trim();
+    var contact=document.getElementById('cContact').value.trim();
+    var msg=document.getElementById('cMsg').value.trim();
+    var ok=true;
+    function chk(cond,id){ markInvalid(id,!cond); if(!cond) ok=false; }
+    chk(name.length>1,'cName'); chk(contact.length>3,'cContact'); chk(msg.length>3,'cMsg');
+    if(!ok) return;
+    var submitBtn = root.querySelector('#contactForm button[type=submit]');
+    if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
+    supaInsert('contacts', {name:name, contact:contact, subject:document.getElementById('cSubject').value, message:msg}).then(function(){
+      document.getElementById('contactFormCard').innerHTML = '<div class="success-box">'+icon('check')+'<h3 style="margin-top:12px;">تم إرسال رسالتك</h3><p class="muted" style="margin-top:8px;">هيتواصل معاك فريقنا في أقرب وقت.</p></div>';
+    }).catch(function(){
+      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='إرسال الرسالة'; }
+      toast('حصل خطأ في إرسال الرسالة، حاول تاني.');
+    });
+  });
+});
+/* ===================================================================
+   LOGIN
+   =================================================================== */
+register('login', function(root){
+  root.innerHTML =
+  '<div class="section container">'+
+    '<div class="card passcode-box">'+
+      '<div class="brand" style="justify-content:center;margin-bottom:6px;"><div class="brand-mark">'+BRAND.mark+'</div></div>'+
+      '<h2 style="margin-top:10px;font-size:22px;">تسجيل الدخول</h2>'+
+      '<p class="muted" style="margin-top:8px;font-size:14px;">ادخل كود التتبع اللي استلمته بعد تسجيل طلبك أو مساحتك.</p>'+
+      '<div class="field" style="margin-top:20px;text-align:right;"><input type="text" id="loginCode" placeholder="مثال: CS-DOC-12345"></div>'+
+      '<div id="loginErr" class="muted" style="color:var(--danger);font-size:13px;margin-top:8px;display:none;"></div>'+
+      '<button class="btn btn-primary btn-block" id="loginBtn" style="margin-top:16px;">دخول</button>'+
+      '<p class="hint" style="margin-top:16px;">لسه معملتش طلب؟ <a href="#/register" style="color:var(--teal-dark);text-decoration:underline;">سجّل دلوقتي</a></p>'+
+    '</div>'+
+  '</div>';
+  function tryLogin(){
+    var code = document.getElementById('loginCode').value.trim().toUpperCase();
+    var err = document.getElementById('loginErr');
+    var btn = document.getElementById('loginBtn');
+    err.style.display='none';
+    if(!code){ err.style.display='block'; err.textContent='من فضلك اكتب كود التتبع'; return; }
+    btn.disabled = true; btn.textContent='جاري التحقق...';
+    callApi('lookup_by_code', {code:code}).then(function(res){
+      btn.disabled=false; btn.textContent='دخول';
+      if(!res || !res.type){ err.style.display='block'; err.textContent='لم نلاقِ بيانات بهذا الكود. تأكد إنه صحيح.'; return; }
+      navigate('/'+(res.type==='owner'?'dashboard-owner':'dashboard-doctor')+'?code='+code);
+    }).catch(function(){
+      btn.disabled=false; btn.textContent='دخول';
+      err.style.display='block'; err.textContent='حصل خطأ في الاتصال، حاول تاني.';
+    });
+  }
+  document.getElementById('loginBtn').addEventListener('click', tryLogin);
+  document.getElementById('loginCode').addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+});
+
+/* ===================================================================
+   REGISTER
+   =================================================================== */
+register('register', function(root){
+  root.innerHTML =
+  '<div class="container page-hero center"><h1>سجّل دلوقتي في '+BRAND.name+'</h1><p style="margin:10px auto 0;">اختار الوصف اللي يناسبك، وهنوجّهك لطلب التسجيل المناسب في دقيقتين.</p></div>'+
+  '<div class="section container"><div class="grid journey-grid">'+
+    '<div class="card journey-card doctor" data-go="need-clinic" style="cursor:pointer;">'+
+      '<div class="icon-wrap" style="background:rgba(20,184,166,.16);">'+icon('doctor')+'</div>'+
+      '<h3 style="margin-top:16px;">أنا دكتور وبدور على عيادة</h3><p class="muted" style="color:#B9C6DC;">سجّل تخصصك واحتياجاتك وهنرشحلك أماكن فورًا.</p>'+
+      '<span class="btn btn-primary btn-block" style="margin-top:20px;">ابدأ التسجيل</span>'+
+    '</div>'+
+    '<div class="card journey-card owner" data-go="list-space" style="cursor:pointer;">'+
+      '<div class="icon-wrap">'+icon('building')+'</div>'+
+      '<h3 style="margin-top:16px;">عندي عيادة أو غرفة متاحة</h3><p class="muted">سجّل بيانات مساحتك وابدأ تستقبل ترشيحات دكاترة.</p>'+
+      '<span class="btn btn-dark btn-block" style="margin-top:20px;">ابدأ التسجيل</span>'+
+    '</div>'+
+  '</div>'+
+  '<p class="center muted" style="margin-top:24px;">عندك كود تتبع بالفعل؟ <a href="#/login" style="color:var(--teal-dark);text-decoration:underline;">سجّل الدخول من هنا</a></p></div>';
+});
+
+/* ===================================================================
+   DOCTOR DASHBOARD
+   =================================================================== */
+register('dashboard-doctor', async function(root, r){
+  var code = r.query.code;
+  if(!code){ root.innerHTML = dashLoginPrompt('doctor'); bindDashLogin(root,'doctor'); return; }
+  var reqObj = null;
+  try{
+    var lookupRes = await callApi('lookup_by_code', {code:code});
+    if(lookupRes && lookupRes.type==='doctor' && lookupRes.row) reqObj = normalizeRequestRow(lookupRes.row);
+  }catch(e){}
+  if(!reqObj){
+    root.innerHTML = dashLoginPrompt('doctor'); bindDashLogin(root,'doctor'); return;
+  }
+  var matches = topMatches(reqObj, 4).filter(function(m){return m.score>0;});
+  root.innerHTML =
+  '<div class="section container">'+
+    '<div class="dash-header"><div><span class="chip chip-teal">'+icon('doctor')+' لوحة تحكم الدكتور</span><h1 style="margin-top:10px;font-size:26px;">أهلًا، '+esc(reqObj.name)+'</h1></div>'+
+    '<div class="flex" style="gap:10px;"><span class="badge-pending">'+icon('clockx')+' '+esc(reqObj.status)+'</span><button class="btn btn-ghost btn-sm" id="logoutBtn">'+icon('logout')+' خروج</button></div></div>'+
+    '<div class="grid kpi-grid">'+
+      '<div class="card kpi-card"><div class="val">'+esc(reqObj.trackingCode)+'</div><div class="lbl">كود التتبع</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+esc(reqObj.specialty)+'</div><div class="lbl">التخصص</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+(reqObj.budgetMax? Number(reqObj.budgetMax).toLocaleString('en-US'):'—')+'</div><div class="lbl">الميزانية القصوى</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+matches.length+'</div><div class="lbl">أماكن مرشّحة</div></div>'+
+    '</div>'+
+    '<h3 style="font-size:18px;margin-bottom:14px;">الأماكن المرشّحة لطلبك</h3>'+
+    (matches.length? '<div class="grid" style="gap:14px;">'+matches.map(matchCard).join('')+'</div>' : '<div class="empty-state card">'+icon('search')+'<p>هنضيف ترشيحات جديدة بمجرد ما فريقنا يراجع طلبك.</p></div>')+
+    '<div class="card card-pad" style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">'+
+      '<div><div style="font-weight:800;">عايز تعدّل طلبك؟</div><div class="muted" style="font-size:13.5px;">تقدر تلغي الطلب الحالي وتسجّل طلب جديد بمواصفات مختلفة.</div></div>'+
+      '<button class="btn btn-ghost btn-sm" id="cancelReq">'+icon('trash')+' إلغاء الطلب</button>'+
+    '</div>'+
+  '</div>';
+  document.getElementById('logoutBtn').addEventListener('click', function(){ navigate('/'); });
+  document.getElementById('cancelReq').addEventListener('click', function(){
+    var btn = document.getElementById('cancelReq');
+    btn.disabled = true;
+    callApi('self_cancel_request', {code:code}).then(function(){
+      toast('تم إلغاء الطلب'); navigate('/need-clinic');
+    }).catch(function(){
+      btn.disabled = false;
+      toast('حصل خطأ، حاول تاني.');
+    });
+  });
+  root.querySelectorAll('[data-int]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btn.disabled = true;
+      supaInsert('interests', {listing_id:btn.getAttribute('data-int'), name:reqObj.name, phone:reqObj.phone, specialty:reqObj.specialty}).then(function(){
+        btn.textContent='تم إرسال الاهتمام ✔';
+      }).catch(function(){
+        btn.disabled=false; toast('حصل خطأ، حاول تاني.');
+      });
+    });
+  });
+});
+
+/* ===================================================================
+   SPACE OWNER DASHBOARD
+   =================================================================== */
+register('dashboard-owner', async function(root, r){
+  var code = r.query.code;
+  if(!code){ root.innerHTML = dashLoginPrompt('owner'); bindDashLogin(root,'owner'); return; }
+  var listing = null;
+  try{
+    var lookupRes = await callApi('lookup_by_code', {code:code});
+    if(lookupRes && lookupRes.type==='owner' && lookupRes.row) listing = normalizeListingRow(lookupRes.row);
+  }catch(e){}
+  if(!listing){
+    root.innerHTML = dashLoginPrompt('owner'); bindDashLogin(root,'owner'); return;
+  }
+  var interests = [];
+  try{
+    var interestsRes = await callApi('owner_interests', {code:code});
+    if(interestsRes && interestsRes.rows) interests = interestsRes.rows.map(function(row){ return {specialty:row.specialty, createdAt:row.created_at}; });
+  }catch(e){}
+  root.innerHTML =
+  '<div class="section container">'+
+    '<div class="dash-header"><div><span class="chip chip-teal">'+icon('building')+' لوحة تحكم صاحب المساحة</span><h1 style="margin-top:10px;font-size:26px;">أهلًا، '+esc(listing.ownerName||'')+'</h1></div>'+
+    '<div class="flex" style="gap:10px;">'+(listing.verified?'<span class="badge-verified">'+icon('shield')+' موثّقة</span>':'<span class="badge-pending">'+icon('clockx')+' قيد المراجعة</span>')+'<button class="btn btn-ghost btn-sm" id="logoutBtn">'+icon('logout')+' خروج</button></div></div>'+
+    '<div class="grid kpi-grid">'+
+      '<div class="card kpi-card"><div class="val">'+listing.price.toLocaleString('en-US')+'</div><div class="lbl">السعر الشهري (ج.م)</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+listing.days.length+'</div><div class="lbl">أيام متاحة</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+interests.length+'</div><div class="lbl">دكاترة مهتمين</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+esc(listing.trackingCode)+'</div><div class="lbl">كود التتبع</div></div>'+
+    '</div>'+
+    '<div class="card card-pad">'+
+      '<h3 style="font-size:17px;margin-bottom:14px;">بيانات المساحة</h3>'+
+      '<p><b>'+esc(listing.title)+'</b> — '+esc(listing.district)+'، '+esc(listing.gov)+'</p>'+
+      '<div class="spec-row" style="margin-top:10px;">'+listing.specialties.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join('')+'</div>'+
+      '<p class="muted" style="margin-top:12px;font-size:13.5px;">'+esc(listing.desc)+'</p>'+
+    '</div>'+
+    '<h3 style="font-size:17px;margin:24px 0 14px;">الدكاترة المهتمين'+(interests.length?'':' — لسه محدش أبدى اهتمام')+'</h3>'+
+    (interests.length? '<div class="table-wrap card"><table class="data-table"><tr><th>التخصص</th><th>تاريخ الاهتمام</th><th>الحالة</th></tr>'+
+      interests.map(function(it){return '<tr><td>'+esc(it.specialty||'—')+'</td><td>'+new Date(it.createdAt).toLocaleDateString('ar-EG')+'</td><td><span class="badge-pending">بيانات مخفية حتى موافقة الفريق</span></td></tr>';}).join('')+'</table></div>'
+      : '<div class="empty-state card">'+icon('users')+'<p>بمجرد ما دكتور يهتم بمساحتك، هيظهر هنا (مع إخفاء بياناته الشخصية لحد موافقة فريقنا).</p></div>')+
+    '<div class="card card-pad" style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">'+
+      '<div><div style="font-weight:800;">عندك مساحة تانية فاضية؟</div><div class="muted" style="font-size:13.5px;">تقدر تسجّل أكتر من مكان بأكواد تتبع مختلفة.</div></div>'+
+      '<a href="#/list-space" class="btn btn-primary btn-sm">'+icon('plus')+' أضف مساحة جديدة</a>'+
+    '</div>'+
+  '</div>';
+  document.getElementById('logoutBtn').addEventListener('click', function(){ navigate('/'); });
+});
+
+function dashLoginPrompt(kind){
+  return '<div class="section container"><div class="card passcode-box">'+icon('lock')+
+    '<h3 style="margin-top:12px;">محتاج كود التتبع</h3><p class="muted" style="font-size:13.5px;margin-top:8px;">من فضلك دخول بكود التتبع بتاعك لعرض لوحة التحكم.</p>'+
+    '<div class="field" style="margin-top:16px;text-align:right;"><input type="text" id="dashCode" placeholder="مثال: CS-'+(kind==='owner'?'OWN':'DOC')+'-12345"></div>'+
+    '<button class="btn btn-primary btn-block" id="dashLoginBtn" style="margin-top:14px;">دخول</button>'+
+    '<p class="hint" style="margin-top:14px;">لسه معملتش طلب؟ <a href="#/'+(kind==='owner'?'list-space':'need-clinic')+'" style="color:var(--teal-dark);text-decoration:underline;">سجّل دلوقتي</a></p>'+
+    '</div></div>';
+}
+function bindDashLogin(root, kind){
+  document.getElementById('dashLoginBtn').addEventListener('click', function(){
+    var code = document.getElementById('dashCode').value.trim().toUpperCase();
+    navigate('/'+(kind==='owner'?'dashboard-owner':'dashboard-doctor')+'?code='+code);
+  });
+}
+
+/* ===================================================================
+   ADMIN DASHBOARD (demo passcode gate — replace with real auth for production)
+   =================================================================== */
+register('admin', function(root){
+  var savedPass = sessionStorage.getItem('cs_admin_pass');
+  if(!savedPass){
+    root.innerHTML =
+    '<div class="section container"><div class="card passcode-box">'+icon('lock')+
+      '<h3 style="margin-top:12px;">دخول فريق '+BRAND.name+'</h3><p class="muted" style="font-size:13.5px;margin-top:8px;">لوحة داخلية لفريق العمل فقط.</p>'+
+      '<div class="field" style="margin-top:16px;text-align:right;"><input type="password" id="adminPass" placeholder="كلمة المرور"></div>'+
+      '<button class="btn btn-primary btn-block" id="adminLoginBtn" style="margin-top:14px;">دخول</button>'+
+    '</div></div>';
+    document.getElementById('adminLoginBtn').addEventListener('click', function(){
+      var val = document.getElementById('adminPass').value;
+      if(!val){ toast('اكتب كلمة المرور'); return; }
+      var btn = document.getElementById('adminLoginBtn');
+      btn.disabled = true; btn.textContent='جاري التحقق...';
+      callApi('admin_list', {table:'listings', pass:val}).then(function(){
+        sessionStorage.setItem('cs_admin_pass', val);
+        render();
+      }).catch(function(){
+        btn.disabled = false; btn.textContent='دخول';
+        toast('كلمة المرور غير صحيحة');
+      });
+    });
+    return;
+  }
+  renderAdminPanel(root, savedPass);
+});
+function renderAdminPanel(root, pass){
+  root.innerHTML = '<div class="section container"><div class="empty-state card">'+icon('info')+'<p>جاري تحميل بيانات لوحة التحكم...</p></div></div>';
+  Promise.all([
+    callApi('admin_list', {table:'listings', pass:pass}),
+    callApi('admin_list', {table:'requests', pass:pass}),
+    callApi('admin_list', {table:'contacts', pass:pass})
+  ]).then(function(results){
+    var listings = (results[0].rows||[]).map(normalizeListingRow);
+    var requests = (results[1].rows||[]).map(normalizeRequestRow);
+    var contacts = (results[2].rows||[]).map(function(row){ return {id:row.id, name:row.name, contact:row.contact, subject:row.subject, message:row.message, createdAt:row.created_at}; });
+    renderAdminPanelBody(root, pass, listings, requests, contacts);
+  }).catch(function(e){
+    if(e && e.status===401){
+      sessionStorage.removeItem('cs_admin_pass');
+      toast('انتهت الجلسة، سجّل دخولك تاني');
+      navigate('/admin'); render();
+      return;
+    }
+    root.innerHTML = '<div class="section container"><div class="empty-state card">'+icon('info')+'<p>حصل خطأ في تحميل بيانات لوحة التحكم. حاول تحدّث الصفحة.</p></div></div>';
+  });
+}
+function renderAdminPanelBody(root, pass, listings, requests, contacts){
+  var pendingL = listings.filter(function(l){return !l.verified;}).length;
+  root.innerHTML =
+  '<div class="section container">'+
+    '<div class="dash-header"><div><span class="chip chip-teal">'+icon('dashboard')+' لوحة تحكم الأدمن</span><h1 style="margin-top:10px;font-size:26px;">مرحبًا بفريق '+BRAND.name+'</h1></div>'+
+    '<button class="btn btn-ghost btn-sm" id="adminLogout">'+icon('logout')+' خروج</button></div>'+
+    '<div class="legal-note">'+icon('info')+' البيانات هنا محفوظة في قاعدة بيانات مركزية حقيقية يشاركها كل الزوار والفريق مباشرة.</div>'+
+    '<div class="grid kpi-grid">'+
+      '<div class="card kpi-card"><div class="val">'+listings.length+'</div><div class="lbl">إجمالي المساحات</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+pendingL+'</div><div class="lbl">مساحات قيد المراجعة</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+requests.length+'</div><div class="lbl">طلبات دكاترة</div></div>'+
+      '<div class="card kpi-card"><div class="val">'+contacts.length+'</div><div class="lbl">رسائل تواصل</div></div>'+
+    '</div>'+
+    '<div class="tab-bar">'+
+      '<button class="tab-btn active" data-tab="listings">المساحات</button>'+
+      '<button class="tab-btn" data-tab="requests">طلبات الدكاترة</button>'+
+      '<button class="tab-btn" data-tab="contacts">رسائل التواصل</button>'+
+    '</div>'+
+    '<div id="adminTabBody"></div>'+
+  '</div>';
+  document.getElementById('adminLogout').addEventListener('click', function(){ sessionStorage.removeItem('cs_admin_pass'); navigate('/'); });
+  function showTab(tab){
+    root.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab')===tab); });
+    var body = document.getElementById('adminTabBody');
+    if(tab==='listings'){
+      body.innerHTML = '<div class="table-wrap card"><table class="data-table"><tr><th>المكان</th><th>المنطقة</th><th>السعر</th><th>الحالة</th><th>مصدر</th><th>إجراء</th></tr>'+
+        listings.map(function(l){
+          var isDemo = l.isSeed;
+          return '<tr><td>'+esc(l.title)+'</td><td>'+esc(l.district)+'</td><td>'+l.price.toLocaleString('en-US')+' ج.م</td>'+
+          '<td>'+(l.verified?'<span class="badge-verified">موثّقة</span>':'<span class="badge-pending">قيد المراجعة</span>')+'</td>'+
+          '<td class="muted">'+(isDemo?'بيانات تجريبية':'مُقدَّم من مستخدم')+'</td>'+
+          '<td>'+(isDemo?'—':'<button class="btn btn-ghost btn-sm" data-verify="'+l.id+'" data-verified="'+(l.verified?'1':'0')+'">'+(l.verified?'إلغاء التوثيق':'توثيق ✔')+'</button>')+'</td></tr>';
+        }).join('')+'</table></div>';
+      body.querySelectorAll('[data-verify]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id=btn.getAttribute('data-verify'); var current=btn.getAttribute('data-verified')==='1';
+          btn.disabled = true;
+          callApi('admin_update', {table:'listings', id:id, patch:{verified: !current}, pass:pass}).then(function(){
+            ensureListings(true);
+            renderAdminPanel(root, pass);
+          }).catch(function(){ btn.disabled=false; toast('حصل خطأ، حاول تاني.'); });
+        });
+      });
+    } else if(tab==='requests'){
+      body.innerHTML = requests.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التخصص</th><th>المنطقة</th><th>الميزانية</th><th>كود التتبع</th><th>أفضل Match</th></tr>'+
+        requests.map(function(rq){
+          var best = topMatches(rq,1)[0];
+          return '<tr><td>'+esc(rq.name)+'</td><td>'+esc(rq.specialty)+'</td><td>'+esc(rq.district||'أي منطقة')+'</td><td>'+(rq.budgetMax?Number(rq.budgetMax).toLocaleString('en-US'):'—')+'</td><td>'+esc(rq.trackingCode)+'</td><td>'+(best?best.score+'% — '+esc(best.listing.title):'—')+'</td></tr>';
+        }).join('')+'</table></div>' : '<div class="empty-state card">'+icon('info')+'<p>لسه مفيش طلبات دكاترة مسجّلة.</p></div>';
+    } else {
+      body.innerHTML = contacts.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التواصل</th><th>الموضوع</th><th>الرسالة</th></tr>'+
+        contacts.map(function(c){return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.contact)+'</td><td>'+esc(c.subject||'—')+'</td><td style="white-space:normal;max-width:300px;">'+esc(c.message)+'</td></tr>';}).join('')+'</table></div>' : '<div class="empty-state card">'+icon('mail')+'<p>لسه مفيش رسائل تواصل.</p></div>';
+    }
+  }
+  root.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-tab')); }); });
+  showTab('listings');
+}
+/* ===================================================================
+   PRIVACY POLICY
+   =================================================================== */
+register('privacy', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>سياسة الخصوصية</span></div>'+
+  '<h1>سياسة الخصوصية</h1><p>آخر تحديث: '+new Date().toLocaleDateString('ar-EG')+'</p></div>'+
+  '<div class="section container"><div class="legal-content">'+
+    '<div class="legal-note">'+icon('info')+' هذا نص نموذجي مبدئي لأغراض النسخة التجريبية (MVP)، وننصح بمراجعته مع مستشار قانوني قبل الإطلاق الرسمي للمنصة.</div>'+
+    '<h3>١. البيانات اللي بنجمعها</h3><p>بنجمع البيانات اللي بتقدمها بنفسك عند التسجيل أو تقديم طلب، ومنها: الاسم، رقم الموبايل، البريد الإلكتروني، وبيانات المكان أو الطلب (المنطقة، التخصص، الأيام، الميزانية، وتفاصيل المساحة).</p>'+
+    '<h3>٢. الغرض من استخدام البيانات</h3><p>بنستخدم بياناتك فقط لتسهيل عملية التوفيق (Matching) بينك وبين الطرف الآخر المناسب، والتواصل معاك بخصوص طلبك، وتحسين جودة الخدمة.</p>'+
+    '<h3>٣. مشاركة بيانات التواصل</h3><p>رقم الموبايل والبريد الإلكتروني وبيانات التواصل المباشرة <b>لا تُعرض للطرف الآخر إطلاقًا</b> إلا بعد موافقة فريق '+BRAND.name+' وتنسيق عملية المعاينة بين الطرفين.</p>'+
+    '<h3>٤. تخزين البيانات</h3><p>بياناتك بتُخزَّن في قاعدة بيانات مركزية آمنة، ومحمية بإجراءات تحكم في الوصول بحيث إن بيانات التواصل المباشرة (الاسم، الموبايل، البريد الإلكتروني) لا يقدر يشوفها إلا فريق '+BRAND.name+' المصرّح له.</p>'+
+    '<h3>٥. عدم بيع البيانات</h3><p>'+BRAND.name+' لا تبيع ولا تؤجر بياناتك الشخصية لأي طرف ثالث لأغراض تسويقية.</p>'+
+    '<h3>٦. حقوقك</h3><p>تقدر تطلب في أي وقت مراجعة أو تعديل أو حذف بياناتك عن طريق التواصل معنا من <a href="#/contact" style="color:var(--teal-dark);text-decoration:underline;">صفحة التواصل</a>.</p>'+
+    '<h3>٧. تحديث السياسة</h3><p>ممكن نحدّث هذه السياسة من وقت لآخر مع تطور المنصة، وهنوضح أي تغييرات جوهرية على الصفحة ده.</p>'+
+    '<h3>٨. التواصل</h3><p>لأي استفسار يخص الخصوصية، تواصل معنا على '+BRAND.supportEmail+'.</p>'+
+  '</div></div>';
+});
+
+/* ===================================================================
+   TERMS & CONDITIONS
+   =================================================================== */
+register('terms', function(root){
+  root.innerHTML =
+  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>الشروط والأحكام</span></div>'+
+  '<h1>الشروط والأحكام</h1><p>آخر تحديث: '+new Date().toLocaleDateString('ar-EG')+'</p></div>'+
+  '<div class="section container"><div class="legal-content">'+
+    '<div class="legal-note">'+icon('info')+' هذا نص نموذجي مبدئي لأغراض النسخة التجريبية (MVP)، وننصح بمراجعته مع مستشار قانوني قبل الإطلاق الرسمي للمنصة.</div>'+
+    '<h3>١. طبيعة الخدمة</h3><p>'+BRAND.name+' منصة وسيطة (Broker) بتربط بين الدكاترة المحتاجين مساحات طبية وأصحاب العيادات أو المراكز اللي عندهم مساحات أو أوقات غير مستغلة. المنصة <b>ليست طرفًا في أي عقد إيجار أو استخدام</b> يتم التوصل إليه بين المستخدمين.</p>'+
+    '<h3>٢. العمولة</h3><p>نموذج العمل الحالي هو عمولة توفيق تُدفع مرة واحدة بعد نجاح التوفيق بين الطرفين. تُحدَّد نسبة أو قيمة العمولة والجهة المسؤولة عن دفعها بالتفاصيل مع فريق '+BRAND.name+' قبل إتمام التعاقد النهائي. لا يوجد دفع أونلاين عبر المنصة في النسخة الحالية.</p>'+
+    '<h3>٣. مسؤولية دقة البيانات</h3><p>يتحمّل كل مستخدم مسؤولية دقة البيانات اللي بيقدمها (بيانات المكان، التخصص، الأيام، الأسعار). '+BRAND.name+' بتراجع البيانات قبل النشر لكنها لا تضمن اكتمال كل التفاصيل بدون تحقق مباشر من الطرفين.</p>'+
+    '<h3>٤. علامة "موثّقة"</h3><p>علامة "موثّقة" تعني إن فريقنا راجع البيانات الأساسية للمكان، ولا تعني ضمانًا قانونيًا كاملًا لحالة العيادة أو ترخيصها. يُنصح دائمًا بمعاينة المكان بنفسك قبل التعاقد.</p>'+
+    '<h3>٥. الإلغاء</h3><p>يمكن لأي مستخدم إلغاء طلبه أو عرض مساحته في أي وقت قبل إتمام التعاقد، من لوحة التحكم الخاصة به أو بالتواصل مع فريق الدعم.</p>'+
+    '<h3>٦. حدود المسؤولية</h3><p>'+BRAND.name+' غير مسؤولة عن أي خلافات تنشأ بعد التعاقد المباشر بين الطرفين، وتقتصر مسؤوليتها على عملية التوفيق والتنسيق قبل التعاقد.</p>'+
+    '<h3>٧. القانون الحاكم</h3><p>تخضع هذه الشروط لقوانين جمهورية مصر العربية.</p>'+
+    '<h3>٨. التواصل</h3><p>لأي استفسار يخص هذه الشروط، تواصل معنا على '+BRAND.supportEmail+'.</p>'+
+  '</div></div>';
+});
+register('notfound', function(root){ root.innerHTML = '<div class="section container center"><h2>الصفحة غير موجودة</h2><p class="muted" style="margin-top:10px;">جرب الرجوع للرئيسية.</p><a href="#/" class="btn btn-primary" style="margin-top:20px;">الرئيسية</a></div>'; });
+
+/* ===================== INIT ===================== */
+renderShell();
+render();
+
+})();
+</script>
+
+</html>
