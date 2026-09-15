@@ -430,6 +430,14 @@ table.data-table tr:last-child td{border-bottom:none;}
 #toast{position:fixed;bottom:22px;inset-inline:0;display:flex;justify-content:center;z-index:200;pointer-events:none;}
 #toast .msg{background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:700;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(10px);transition:opacity .25s, transform .25s;}
 #toast .msg.show{opacity:1;transform:translateY(0);}
+
+/* admin edit modal */
+.admin-modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;}
+.admin-modal-card{background:var(--surface);border-radius:var(--radius-md);padding:24px;max-width:480px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg);}
+.admin-modal-card h3{margin:0 0 16px;font-size:19px;}
+.admin-modal-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.admin-modal-actions .btn-danger{background:#fee2e2;color:#b91c1c;}
+.admin-modal-actions .btn-danger:hover{background:#fecaca;}
 </style>
 
 <div id="app"></div>
@@ -652,6 +660,20 @@ function toast(msg){
   t.textContent = msg; t.classList.add('show');
   clearTimeout(window.__toastTimer);
   window.__toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+function closeAdminModal(){
+  var bg = document.getElementById('adminModalBg');
+  if(bg) bg.remove();
+}
+function openAdminModal(innerHtml){
+  closeAdminModal();
+  var bg = document.createElement('div');
+  bg.id = 'adminModalBg'; bg.className = 'admin-modal-bg';
+  bg.innerHTML = '<div class="admin-modal-card">'+innerHtml+'</div>';
+  bg.addEventListener('click', function(e){ if(e.target===bg) closeAdminModal(); });
+  document.body.appendChild(bg);
+  return bg;
 }
 
 /* ===================== ROUTER ===================== */
@@ -1719,27 +1741,87 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
           return '<tr><td>'+esc(l.title)+'</td><td>'+esc(l.district)+'</td><td>'+l.price.toLocaleString('en-US')+' ج.م</td>'+
           '<td>'+(l.verified?'<span class="badge-verified">موثّقة</span>':'<span class="badge-pending">قيد المراجعة</span>')+'</td>'+
           '<td class="muted">'+(isDemo?'بيانات تجريبية':'مُقدَّم من مستخدم')+'</td>'+
-          '<td>'+(isDemo?'—':'<button class="btn btn-ghost btn-sm" data-verify="'+l.id+'" data-verified="'+(l.verified?'1':'0')+'">'+(l.verified?'إلغاء التوثيق':'توثيق ✔')+'</button>')+'</td></tr>';
+          '<td style="white-space:nowrap;"><button class="btn btn-ghost btn-sm" data-edit-listing="'+l.id+'">تعديل</button> '+
+          '<button class="btn btn-ghost btn-sm" data-del-listing="'+l.id+'" data-del-title="'+esc(l.title)+'" style="color:#b91c1c;">حذف</button></td></tr>';
         }).join('')+'</table></div>';
-      body.querySelectorAll('[data-verify]').forEach(function(btn){
+      body.querySelectorAll('[data-edit-listing]').forEach(function(btn){
         btn.addEventListener('click', function(){
-          var id=btn.getAttribute('data-verify'); var current=btn.getAttribute('data-verified')==='1';
+          var id = btn.getAttribute('data-edit-listing');
+          var l = listings.find(function(x){ return String(x.id)===String(id); });
+          if(!l) return;
+          var m = openAdminModal(
+            '<h3>تعديل: '+esc(l.title)+'</h3>'+
+            fieldWrap('editTitle','اسم المكان','<input id="editTitle" type="text" value="'+esc(l.title)+'">')+
+            fieldWrap('editDistrict','المنطقة','<input id="editDistrict" type="text" value="'+esc(l.district)+'">')+
+            fieldWrap('editPrice','السعر الشهري (ج.م)','<input id="editPrice" type="number" value="'+l.price+'">')+
+            '<label class="check-inline"><input type="checkbox" id="editVerified" '+(l.verified?'checked':'')+'> موثّقة ومعروضة للزوار</label>'+
+            '<div class="admin-modal-actions">'+
+              '<button class="btn btn-primary btn-sm" id="editSaveBtn">حفظ التعديلات</button>'+
+              '<button class="btn btn-ghost btn-sm" id="editCancelBtn">إلغاء</button>'+
+            '</div>'
+          );
+          m.querySelector('#editCancelBtn').addEventListener('click', closeAdminModal);
+          m.querySelector('#editSaveBtn').addEventListener('click', function(){
+            var saveBtn = m.querySelector('#editSaveBtn'); saveBtn.disabled = true;
+            var patch = {
+              title: m.querySelector('#editTitle').value.trim(),
+              district: m.querySelector('#editDistrict').value.trim(),
+              price: Number(m.querySelector('#editPrice').value) || l.price,
+              verified: m.querySelector('#editVerified').checked
+            };
+            callApi('admin_update', {table:'listings', id:id, patch:patch, pass:pass}).then(function(){
+              closeAdminModal(); toast('اتحفظت التعديلات.');
+              ensureListings(true);
+              renderAdminPanel(root, pass);
+            }).catch(function(){ saveBtn.disabled=false; toast('حصل خطأ، حاول تاني.'); });
+          });
+        });
+      });
+      body.querySelectorAll('[data-del-listing]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-del-listing'); var title = btn.getAttribute('data-del-title');
+          if(!confirm('متأكد إنك عايز تحذف "'+title+'" نهائيًا؟ الإجراء ده مش هيتراجع.')) return;
           btn.disabled = true;
-          callApi('admin_update', {table:'listings', id:id, patch:{verified: !current}, pass:pass}).then(function(){
+          callApi('admin_delete', {table:'listings', id:id, pass:pass}).then(function(){
+            toast('اتحذفت.');
             ensureListings(true);
             renderAdminPanel(root, pass);
           }).catch(function(){ btn.disabled=false; toast('حصل خطأ، حاول تاني.'); });
         });
       });
     } else if(tab==='requests'){
-      body.innerHTML = requests.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التخصص</th><th>المنطقة</th><th>الميزانية</th><th>كود التتبع</th><th>أفضل Match</th></tr>'+
+      body.innerHTML = requests.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التخصص</th><th>المنطقة</th><th>الميزانية</th><th>كود التتبع</th><th>أفضل Match</th><th>إجراء</th></tr>'+
         requests.map(function(rq){
           var best = topMatches(rq,1)[0];
-          return '<tr><td>'+esc(rq.name)+'</td><td>'+esc(rq.specialty)+'</td><td>'+esc(rq.district||'أي منطقة')+'</td><td>'+(rq.budgetMax?Number(rq.budgetMax).toLocaleString('en-US'):'—')+'</td><td>'+esc(rq.trackingCode)+'</td><td>'+(best?best.score+'% — '+esc(best.listing.title):'—')+'</td></tr>';
+          return '<tr><td>'+esc(rq.name)+'</td><td>'+esc(rq.specialty)+'</td><td>'+esc(rq.district||'أي منطقة')+'</td><td>'+(rq.budgetMax?Number(rq.budgetMax).toLocaleString('en-US'):'—')+'</td><td>'+esc(rq.trackingCode)+'</td><td>'+(best?best.score+'% — '+esc(best.listing.title):'—')+'</td>'+
+          '<td><button class="btn btn-ghost btn-sm" data-del-request="'+rq.id+'" data-del-title="'+esc(rq.name)+'" style="color:#b91c1c;">حذف</button></td></tr>';
         }).join('')+'</table></div>' : '<div class="empty-state card">'+icon('info')+'<p>لسه مفيش طلبات دكاترة مسجّلة.</p></div>';
+      body.querySelectorAll('[data-del-request]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-del-request'); var title = btn.getAttribute('data-del-title');
+          if(!confirm('متأكد إنك عايز تحذف طلب "'+title+'" نهائيًا؟')) return;
+          btn.disabled = true;
+          callApi('admin_delete', {table:'requests', id:id, pass:pass}).then(function(){
+            toast('اتحذف.');
+            renderAdminPanel(root, pass);
+          }).catch(function(){ btn.disabled=false; toast('حصل خطأ، حاول تاني.'); });
+        });
+      });
     } else {
-      body.innerHTML = contacts.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التواصل</th><th>الموضوع</th><th>الرسالة</th></tr>'+
-        contacts.map(function(c){return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.contact)+'</td><td>'+esc(c.subject||'—')+'</td><td style="white-space:normal;max-width:300px;">'+esc(c.message)+'</td></tr>';}).join('')+'</table></div>' : '<div class="empty-state card">'+icon('mail')+'<p>لسه مفيش رسائل تواصل.</p></div>';
+      body.innerHTML = contacts.length ? '<div class="table-wrap card"><table class="data-table"><tr><th>الاسم</th><th>التواصل</th><th>الموضوع</th><th>الرسالة</th><th>إجراء</th></tr>'+
+        contacts.map(function(c){return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.contact)+'</td><td>'+esc(c.subject||'—')+'</td><td style="white-space:normal;max-width:300px;">'+esc(c.message)+'</td>'+
+        '<td><button class="btn btn-ghost btn-sm" data-del-contact="'+c.id+'" data-del-title="'+esc(c.name)+'" style="color:#b91c1c;">حذف</button></td></tr>';}).join('')+'</table></div>' : '<div class="empty-state card">'+icon('mail')+'<p>لسه مفيش رسائل تواصل.</p></div>';
+      body.querySelectorAll('[data-del-contact]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-del-contact'); var title = btn.getAttribute('data-del-title');
+          if(!confirm('متأكد إنك عايز تحذف رسالة "'+title+'" نهائيًا؟')) return;
+          btn.disabled = true;
+          callApi('admin_delete', {table:'contacts', id:id, pass:pass}).then(function(){
+            toast('اتحذفت.');
+            renderAdminPanel(root, pass);
+          }).catch(function(){ btn.disabled=false; toast('حصل خطأ، حاول تاني.'); });
+        });
+      });
     }
   }
   root.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ showTab(b.getAttribute('data-tab')); }); });
