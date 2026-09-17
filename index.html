@@ -438,6 +438,12 @@ table.data-table tr:last-child td{border-bottom:none;}
 .admin-modal-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
 .admin-modal-actions .btn-danger{background:#fee2e2;color:#b91c1c;}
 .admin-modal-actions .btn-danger:hover{background:#fecaca;}
+.contact-info-block{display:flex;flex-direction:column;gap:12px;margin:4px 0 6px;}
+.ci-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;font-size:14px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+.ci-row:last-child{border-bottom:none;}
+.ci-label{color:var(--muted);font-weight:700;white-space:nowrap;}
+.ci-val{text-align:left;word-break:break-word;}
+.ci-val a{color:var(--teal-dark);text-decoration:underline;}
 </style>
 
 <div id="app"></div>
@@ -674,6 +680,19 @@ function openAdminModal(innerHtml){
   bg.addEventListener('click', function(e){ if(e.target===bg) closeAdminModal(); });
   document.body.appendChild(bg);
   return bg;
+}
+function ciRow(label, valHtml){
+  return '<div class="ci-row"><span class="ci-label">'+esc(label)+'</span><span class="ci-val">'+valHtml+'</span></div>';
+}
+function ciPhone(phone){ return phone ? '<a href="tel:'+esc(phone)+'">'+esc(phone)+'</a>' : '—'; }
+function ciEmail(email){ return email ? '<a href="mailto:'+esc(email)+'">'+esc(email)+'</a>' : '—'; }
+function openContactModal(title, rows){
+  var m = openAdminModal(
+    '<h3>بيانات التواصل: '+esc(title)+'</h3>'+
+    '<div class="contact-info-block">'+rows.join('')+'</div>'+
+    '<div class="admin-modal-actions"><button class="btn btn-ghost btn-sm" id="ciCloseBtn">إغلاق</button></div>'
+  );
+  m.querySelector('#ciCloseBtn').addEventListener('click', closeAdminModal);
 }
 
 /* ===================== ROUTER ===================== */
@@ -1741,9 +1760,24 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
           return '<tr><td>'+esc(l.title)+'</td><td>'+esc(l.district)+'</td><td>'+l.price.toLocaleString('en-US')+' ج.م</td>'+
           '<td>'+(l.verified?'<span class="badge-verified">موثّقة</span>':'<span class="badge-pending">قيد المراجعة</span>')+'</td>'+
           '<td class="muted">'+(isDemo?'بيانات تجريبية':'مُقدَّم من مستخدم')+'</td>'+
-          '<td style="white-space:nowrap;"><button class="btn btn-ghost btn-sm" data-edit-listing="'+l.id+'">تعديل</button> '+
+          '<td style="white-space:nowrap;"><button class="btn btn-ghost btn-sm" data-view-contact-listing="'+l.id+'">بيانات التواصل</button> '+
+          '<button class="btn btn-ghost btn-sm" data-edit-listing="'+l.id+'">تعديل</button> '+
           '<button class="btn btn-ghost btn-sm" data-del-listing="'+l.id+'" data-del-title="'+esc(l.title)+'" style="color:#b91c1c;">حذف</button></td></tr>';
         }).join('')+'</table></div>';
+      body.querySelectorAll('[data-view-contact-listing]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-view-contact-listing');
+          var l = listings.find(function(x){ return String(x.id)===String(id); });
+          if(!l) return;
+          openContactModal(l.title, [
+            ciRow('اسم صاحب المكان', esc(l.ownerName||'—')),
+            ciRow('رقم التواصل', ciPhone(l.ownerPhone)),
+            ciRow('البريد الإلكتروني', ciEmail(l.ownerEmail)),
+            ciRow('كود التتبع', esc(l.trackingCode||'—')),
+            ciRow('الوصف اللي كتبه', esc(l.desc||'—'))
+          ]);
+        });
+      });
       body.querySelectorAll('[data-edit-listing]').forEach(function(btn){
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-edit-listing');
@@ -1794,8 +1828,22 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
         requests.map(function(rq){
           var best = topMatches(rq,1)[0];
           return '<tr><td>'+esc(rq.name)+'</td><td>'+esc(rq.specialty)+'</td><td>'+esc(rq.district||'أي منطقة')+'</td><td>'+(rq.budgetMax?Number(rq.budgetMax).toLocaleString('en-US'):'—')+'</td><td>'+esc(rq.trackingCode)+'</td><td>'+(best?best.score+'% — '+esc(best.listing.title):'—')+'</td>'+
-          '<td><button class="btn btn-ghost btn-sm" data-del-request="'+rq.id+'" data-del-title="'+esc(rq.name)+'" style="color:#b91c1c;">حذف</button></td></tr>';
+          '<td style="white-space:nowrap;"><button class="btn btn-ghost btn-sm" data-view-contact-request="'+rq.id+'">بيانات التواصل</button> '+
+          '<button class="btn btn-ghost btn-sm" data-del-request="'+rq.id+'" data-del-title="'+esc(rq.name)+'" style="color:#b91c1c;">حذف</button></td></tr>';
         }).join('')+'</table></div>' : '<div class="empty-state card">'+icon('info')+'<p>لسه مفيش طلبات دكاترة مسجّلة.</p></div>';
+      body.querySelectorAll('[data-view-contact-request]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-view-contact-request');
+          var rq = requests.find(function(x){ return String(x.id)===String(id); });
+          if(!rq) return;
+          openContactModal(rq.name, [
+            ciRow('رقم التواصل', ciPhone(rq.phone)),
+            ciRow('البريد الإلكتروني', ciEmail(rq.email)),
+            ciRow('كود التتبع', esc(rq.trackingCode||'—')),
+            ciRow('ملاحظات الطلب', esc(rq.notes||'—'))
+          ]);
+        });
+      });
       body.querySelectorAll('[data-del-request]').forEach(function(btn){
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-del-request'); var title = btn.getAttribute('data-del-title');
