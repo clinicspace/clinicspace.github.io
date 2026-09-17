@@ -518,6 +518,10 @@ var DISTRICTS = [
   {name:'التجمع الخامس', gov:'القاهرة'}
 ];
 var GOVERNORATES = ['القاهرة','الجيزة'];
+function govForDistrict(districtName){
+  for(var i=0;i<DISTRICTS.length;i++) if(DISTRICTS[i].name===districtName) return DISTRICTS[i].gov;
+  return '';
+}
 var SPECIALTIES = ['جلدية','تغذية علاجية','نفسي وعلاج سلوكي','باطنة','أسنان','عظام','أطفال','نساء وتوليد','عيون','أنف وأذن وحنجرة','مسالك بولية','قلب وأوعية دموية','جهاز هضمي','تخسيس ونحت','علاج طبيعي','تخاطب'];
 var DAYS = [{id:'sat',name:'السبت',short:'سبت'},{id:'sun',name:'الأحد',short:'حد'},{id:'mon',name:'الإتنين',short:'إتنين'},{id:'tue',name:'التلات',short:'تلات'},{id:'wed',name:'الأربع',short:'أربع'},{id:'thu',name:'الخميس',short:'خميس'},{id:'fri',name:'الجمعة',short:'جمعة'}];
 function dayName(id){ for(var i=0;i<DAYS.length;i++) if(DAYS[i].id===id) return DAYS[i].name; return id; }
@@ -982,7 +986,7 @@ function checkGroup(name, options, cols){
 }
 function getChecked(root, cls){ return Array.prototype.map.call(root.querySelectorAll('.'+cls+':checked'), function(c){return c.value;}); }
 function markInvalid(id, bad){ var w=document.getElementById('wrap_'+id); if(w) w.classList.toggle('invalid', !!bad); }
-function districtOptions(){ return DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'" data-gov="'+esc(d.gov)+'">'+esc(d.name)+' ('+esc(d.gov)+')</option>';}).join(''); }
+function districtOptions(){ return DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'">'+esc(d.name)+'</option>';}).join(''); }
 
 /* ===================================================================
    LIST YOUR SPACE (space owner intake)
@@ -998,7 +1002,6 @@ register('list-space', function(root){
           fieldWrap('ownerName','اسمك بالكامل','<input id="ownerName" type="text" placeholder="مثال: د. أحمد سامي">')+
           fieldWrap('ownerPhone','رقم الموبايل','<input id="ownerPhone" type="tel" placeholder="01xxxxxxxxx">','هيُستخدم فقط للتواصل من فريقنا، ولن يظهر للعامة')+
           fieldWrap('ownerEmail','البريد الإلكتروني (اختياري)','<input id="ownerEmail" type="email" placeholder="name@example.com">')+
-          fieldWrap('ownerGov','المحافظة','<select id="ownerGov"><option value="">اختر المحافظة</option>'+GOVERNORATES.map(function(g){return '<option>'+esc(g)+'</option>';}).join('')+'</select>')+
           fieldWrap('ownerDistrict','المنطقة','<select id="ownerDistrict"><option value="">اختر المنطقة</option>'+districtOptions()+'</select>')+
           fieldWrap('ownerType','نوع المكان','<select id="ownerType"><option value="">اختر النوع</option>'+CLINIC_TYPES.map(function(t){return '<option>'+esc(t)+'</option>';}).join('')+'</select>')+
           fieldWrap('ownerShift','الفترة / الشيفت','<select id="ownerShift"><option value="">اختر الفترة</option>'+SHIFTS.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>';}).join('')+'</select>')+
@@ -1019,8 +1022,8 @@ register('list-space', function(root){
     e.preventDefault();
     var name=document.getElementById('ownerName').value.trim();
     var phone=document.getElementById('ownerPhone').value.trim();
-    var gov=document.getElementById('ownerGov').value;
     var district=document.getElementById('ownerDistrict').value;
+    var gov=govForDistrict(district);
     var type=document.getElementById('ownerType').value;
     var shift=document.getElementById('ownerShift').value;
     var price=document.getElementById('ownerPrice').value;
@@ -1030,7 +1033,7 @@ register('list-space', function(root){
     var agree=document.getElementById('ownerAgree').checked;
     var ok=true;
     function chk(cond,id){ markInvalid(id,!cond); if(!cond) ok=false; }
-    chk(name.length>1,'ownerName'); chk(phone.length>=8,'ownerPhone'); chk(gov,'ownerGov'); chk(district,'ownerDistrict');
+    chk(name.length>1,'ownerName'); chk(phone.length>=8,'ownerPhone'); chk(district,'ownerDistrict');
     chk(type,'ownerType'); chk(shift,'ownerShift'); chk(price && Number(price)>0,'ownerPrice'); chk(desc.length>4,'ownerDesc');
     chk(specs.length>0,'ownerSpecs'); chk(days.length>0,'ownerDays');
     if(!agree){ toast('لازم توافق على الشروط والأحكام أولًا'); ok=false; }
@@ -1080,7 +1083,6 @@ register('need-clinic', function(root, r){
           fieldWrap('drPhone','رقم الموبايل','<input id="drPhone" type="tel" placeholder="01xxxxxxxxx">','هيُستخدم فقط للتواصل من فريقنا')+
           fieldWrap('drEmail','البريد الإلكتروني (اختياري)','<input id="drEmail" type="email" placeholder="name@example.com">')+
           fieldWrap('drSpec','تخصصك الطبي','<select id="drSpec"><option value="">اختر التخصص</option>'+SPECIALTIES.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select>')+
-          fieldWrap('drGov','المحافظة المفضلة','<select id="drGov"><option value="">أي محافظة</option>'+GOVERNORATES.map(function(g){return '<option>'+esc(g)+'</option>';}).join('')+'</select>')+
           fieldWrap('drDistrict','المنطقة المفضلة','<select id="drDistrict"><option value="">أي منطقة</option>'+districtOptions()+'</select>')+
           fieldWrap('drRental','نوع الإيجار المطلوب','<select id="drRental"><option value="">اختر النوع</option>'+RENTAL_TYPES.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+'</option>';}).join('')+'</select>')+
           fieldWrap('drBudget','الميزانية الشهرية القصوى (ج.م)','<input id="drBudget" type="number" placeholder="مثال: 6000">')+
@@ -1117,8 +1119,8 @@ register('need-clinic', function(root, r){
     var days = getChecked(root,'grp-rdays');
     var facilities = getChecked(root,'grp-rfac');
     var email = document.getElementById('drEmail').value.trim();
-    var gov = document.getElementById('drGov').value;
     var district = document.getElementById('drDistrict').value;
+    var gov = govForDistrict(district);
     var rental = document.getElementById('drRental').value;
     var notes = document.getElementById('drNotes').value.trim();
     var reqObj = {
@@ -1459,7 +1461,7 @@ register('dashboard-owner', async function(root, r){
     '</div>'+
     '<div class="card card-pad">'+
       '<h3 style="font-size:17px;margin-bottom:14px;">بيانات المساحة</h3>'+
-      '<p><b>'+esc(listing.title)+'</b> — '+esc(listing.district)+'، '+esc(listing.gov)+'</p>'+
+      '<p><b>'+esc(listing.title)+'</b> — '+esc(listing.district)+'</p>'+
       '<div class="spec-row" style="margin-top:10px;">'+listing.specialties.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join('')+'</div>'+
       '<p class="muted" style="margin-top:12px;font-size:13.5px;">'+esc(listing.desc)+'</p>'+
     '</div>'+
