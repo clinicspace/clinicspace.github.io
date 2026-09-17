@@ -411,7 +411,7 @@ button{font-family:var(--font-body);cursor:pointer;}
 .kpi-card .lbl{color:var(--muted);font-size:12.5px;font-weight:700;margin-top:4px;}
 .table-wrap{overflow-x:auto;}
 table.data-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
-table.data-table th{text-align:right;color:var(--muted);font-weight:700;font-size:12.5px;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.data-table th{text-align:start;color:var(--muted);font-weight:700;font-size:12.5px;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
 table.data-table td{padding:12px;border-bottom:1px solid var(--border);white-space:nowrap;}
 table.data-table tr:last-child td{border-bottom:none;}
 .tab-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
@@ -452,8 +452,12 @@ table.data-table tr:last-child td{border-bottom:none;}
 <script>
 (function(){
 "use strict";
-document.documentElement.setAttribute('lang','ar');
-document.documentElement.setAttribute('dir','rtl');
+
+/* ===================== LANGUAGE / i18n ===================== */
+var LANG = 'ar';
+try{ var _savedLang = localStorage.getItem('cs_lang'); if(_savedLang==='en'||_savedLang==='ar') LANG = _savedLang; }catch(e){}
+document.documentElement.setAttribute('lang', LANG==='en'?'en':'ar');
+document.documentElement.setAttribute('dir', LANG==='en'?'ltr':'rtl');
 
 /* ===================== BRAND CONFIG (swap here to rebrand) ===================== */
 var BRAND = {
@@ -464,6 +468,589 @@ var BRAND = {
   supportEmail:'info@clinicspace.eg',
   supportPhone:'01xxxxxxxxx'
 };
+
+/* ===================== TRANSLATION DICTIONARY (AR -> EN) =====================
+   Substring-based: every render always produces Arabic text from the source
+   data; when LANG==='en' a DOM pass rewrites matching Arabic substrings to
+   English. Longer/more specific phrases are matched before shorter ones so
+   full sentences translate cleanly even when a short word is also a key. */
+var DICT_RAW = [
+  // Exact brand-combined phrases (kept whole for natural English word order)
+  ['دخول فريق ClinicSpace','ClinicSpace Team Login'],
+  ['مرحبًا بفريق ClinicSpace','Welcome, ClinicSpace Team'],
+  ['سجّل دلوقتي في ClinicSpace','Sign Up Now at ClinicSpace'],
+  ['إحنا فريق ClinicSpace','We Are the ClinicSpace Team'],
+  ['ليه تثق في ClinicSpace؟','Why Trust ClinicSpace?'],
+  ['إزاي بتشتغل ClinicSpace؟','How Does ClinicSpace Work?'],
+  ['ClinicSpace بتحل المشكلتين مع بعض: بتوصل الدكتور اللي محتاج مكان بصاحب العيادة اللي عنده وقت فاضي، من غير ما أي طرف يدفع أو يستلم تكلفة عيادة كاملة غير مستغلة.',
+    'ClinicSpace solves both problems at once: it connects a doctor who needs a space with a clinic owner who has free time, without either side paying for or losing income on an unused full clinic.'],
+  ['ClinicSpace لسه نسخة MVP تجريبية بنستخدمها لفهم احتياجات السوق المصري بشكل أدق قبل الإطلاق الكامل — فلو عندك ملاحظة أو اقتراح، تواصل معنا في أي وقت.',
+    'ClinicSpace is still an experimental MVP version we are using to understand the needs of the Egyptian market more precisely before the full launch — so if you have any feedback or suggestions, contact us anytime.'],
+
+  // Nav / footer
+  ['الرئيسية','Home'],
+  ['دوّر على عيادة','Find a Clinic'],
+  ['بدور على عيادة','Find a Clinic'],
+  ['عندي مساحة متاحة','I Have a Space Available'],
+  ['عندي مساحة','List Your Space'],
+  ['إزاي بتشتغل','How It Works'],
+  ['الأسئلة الشائعة','FAQ'],
+  ['تواصل معانا','Contact Us'],
+  ['تواصل معنا','Contact Us'],
+  ['تسجيل الدخول','Login'],
+  ['سجّل دلوقتي','Sign Up Now'],
+  ['قانوني وتواصل','Legal & Contact'],
+  ['المنصة','Platform'],
+  ['من نحن','About Us'],
+  ['حسابك','Your Account'],
+  ['التسجيل','Register'],
+  ['سياسة الخصوصية','Privacy Policy'],
+  ['الشروط والأحكام','Terms & Conditions'],
+  ['كل الحقوق محفوظة','All rights reserved'],
+  ['نسخة MVP تجريبية للتحقق من فكرة المنتج','Experimental MVP version to validate the product idea'],
+  ['منصة مصرية بتربط الدكاترة بالمساحات الطبية غير المستغلة — Matching متخصص مش مجرد إعلانات عقارية.','An Egyptian platform connecting doctors with underused medical spaces — specialized matching, not just listings.'],
+  ['عيادتك في المكان والوقت المناسب','Your clinic, in the right place and time'],
+
+  // Home page
+  ['منصة مصرية جديدة — نسخة Beta','A new Egyptian platform — Beta version'],
+  ['منصة بتساعد الدكاترة يلاقوا عيادات وغرف طبية مجهزة بالأيام والمواعيد المناسبة ليهم، وبتساعد أصحاب العيادات يستفيدوا من المساحات والأوقات غير المستغلة.',
+    'A platform that helps doctors find fully equipped clinics and rooms with the days and times that suit them, and helps clinic owners make the most of unused space and time.'],
+  ['Matching متخصص للدكاترة — مش مجرد إعلانات عقارية','Specialized matching for doctors — not just property listings'],
+  ['عيادة مجهزة — الشيخ زايد','Furnished Clinic — Sheikh Zayed'],
+  ['مساحة مشتركة — التجمع الخامس','Shared Space — Fifth Settlement'],
+  ['المنطقة مناسبة','Good location match'],
+  ['الأيام المطلوبة متاحة','Requested days available'],
+  ['داخل الميزانية','Within budget'],
+  ['الخدمات المطلوبة موجودة','Requested amenities available'],
+  ['مناسبة للتخصص المطلوب','Matches the requested specialty'],
+  ['مناسبة للتخصص','Matches specialty'],
+  ['اعمل Match دلوقتي','Get Matched Now'],
+  ['كل المناطق','All Areas'],
+  ['كل التخصصات','All Specialties'],
+  ['المنطقة','Area'],
+  ['الأيام المطلوبة','Requested Days'],
+  ['أي وقت','Any Time'],
+  ['الميزانية (حتى)','Budget (up to)'],
+  ['سجّل طلبك','Submit Your Request'],
+  ['ليه تدفع تكلفة عيادة كاملة لو محتاجها يومين أو ٣ في الأسبوع؟','Why pay for a whole clinic if you only need it two or three days a week?'],
+  ['إيجارات مرتفعة','High Rent'],
+  ['إيجار عيادة كاملة شهريًا تكلفة كبيرة، خصوصًا في المناطق المطلوبة زي التجمع والشيخ زايد.','Renting a full clinic every month is a major cost, especially in in-demand areas like New Cairo and Sheikh Zayed.'],
+  ['تكلفة تجهيز وتشغيل','Setup & Running Costs'],
+  ['التجهيز والتشطيب والموظفين والفواتير الشهرية بتزيد العبء على أي دكتور بيبدأ من الصفر.','Fit-out, finishing, staff, and monthly bills add a heavy burden on any doctor starting from scratch.'],
+  ['أيام كتير غير مستغلة','Lots of Unused Days'],
+  ['في المقابل، عيادات كتير قائمة فيها أيام أو شيفتات فاضية تمامًا وممكن تتحول لدخل إضافي.','Meanwhile, many existing clinics have completely empty days or shifts that could become extra income.'],
+  ['اختار رحلتك','Choose Your Path'],
+  ['إنت هنا كدكتور محتاج مكان، ولا صاحب عيادة عنده مساحة فاضية؟','Are you a doctor looking for a space, or a clinic owner with room to spare?'],
+  ['أنا دكتور وبدور على عيادة','I Am a Doctor Looking for a Clinic'],
+  ['هنرشحلك أفضل مكان يناسب تخصصك وأيامك وميزانيتك.','We will recommend the best place that fits your specialty, days, and budget.'],
+  ['اختار المنطقة','Choose the area'],
+  ['حدد الأيام','Set the days'],
+  ['حدد الميزانية','Set the budget'],
+  ['اختار الخدمات المطلوبة','Choose the required amenities'],
+  ['هنرشحلك أنسب الأماكن','We will recommend the best matching places'],
+  ['ابدأ طلبك','Start Your Request'],
+  ['عندي عيادة أو غرفة متاحة','I Have a Clinic or Room Available'],
+  ['حوّل الأيام والغرف غير المستغلة لدخل إضافي ثابت.','Turn unused days and rooms into steady extra income.'],
+  ['أضف بيانات المكان','Add your space details'],
+  ['حدد الأيام الفاضية','Set your free days'],
+  ['حدد السعر','Set the price'],
+  ['استقبل دكاترة مناسبين','Receive matching doctors'],
+  ['زوّد استفادتك من العيادة','Get more value from your clinic'],
+  ['اعرض مساحتك','List Your Space'],
+  ['إزاي بتشتغل المنصة؟','How does the platform work?'],
+  ['فريقنا بينسّق كل خطوة، من الطلب لحد التعاقد.','Our team coordinates every step, from your request to the final agreement.'],
+  ['قولنا محتاج إيه','Tell us what you need'],
+  ['سجّل طلبك أو مساحتك ببياناتك الأساسية.','Submit your request or your space with your basic details.'],
+  ['بنراجع طلبك','We review your request'],
+  ['فريقنا بيتحقق من البيانات ويتأكد إنها كاملة وصحيحة.','Our team verifies the details and makes sure everything is complete and accurate.'],
+  ['بنرشحلك أفضل Match','We recommend your best match'],
+  ['خوارزمية المطابقة بتختار أقرب الأماكن أو الدكاترة لمتطلباتك.','Our matching algorithm finds the closest places or doctors to your requirements.'],
+  ['ننسق المعاينة والتعاقد','We coordinate the viewing and agreement'],
+  ['بيانات التواصل بتفضل مخفية لحد ما يوافق الفريق وينسق المعاينة.','Contact details stay hidden until our team approves and arranges a viewing.'],
+  ['Matching ذكي','Smart Matching'],
+  ['مش كل عيادة مناسبة لكل دكتور','Not every clinic suits every doctor'],
+  ['بنحسب نسبة توافق حقيقية بين طلبك ومواصفات كل مكان — المنطقة، الأيام، الميزانية، التخصص، والخدمات المطلوبة — عشان ما تضيّعش وقتك في معاينات مش مناسبة.',
+    'We calculate a real compatibility score between your request and each place details — area, days, budget, specialty, and required amenities — so you do not waste time on viewings that do not fit.'],
+  ['مساحة فاضية = فرصة دخل ضايعة','An empty space = a lost income opportunity'],
+  ['حوّل الغرف الفاضية لمصدر دخل شهري ثابت','Turn empty rooms into steady monthly income'],
+  ['استفد من الأيام والشيفتات غير المستغلة صباحًا أو مساءً','Make use of unused morning or evening days and shifts'],
+  ['فريقنا بيتولى فلترة واختيار الدكاترة المناسبين','Our team handles filtering and selecting the right doctors'],
+  ['من غير أي تكلفة تسويق أو إدارة إضافية عليك','With no extra marketing or management cost to you'],
+  ['اعرض عيادتك','List Your Clinic'],
+  ['مثال: عيادة فيها يومين فاضيين أسبوعيًا','Example: a clinic with two free days a week'],
+  ['ممكن تحول لدخل إضافي يقارب ٥,٠٠٠–٧,٠٠٠ ج.م شهريًا حسب المنطقة والتجهيز.','Could turn into extra income of around EGP 5,000–7,000 a month depending on area and setup.'],
+  ['أماكن يتم مراجعتها','Reviewed places'],
+  ['بيانات الدكاترة يتم التحقق منها','Doctor details are verified'],
+  ['بيانات التواصل غير متاحة للعامة','Contact details are not public'],
+  ['تنسيق كامل للمعاينة','Full viewing coordination'],
+  ['دعم لحد الاتفاق النهائي','Support until the final agreement'],
+  ['أسئلة شائعة','Frequently Asked Questions'],
+  ['شوف كل الأسئلة ','View All Questions '],
+  ['سواء عندك مساحة فاضية أو محتاج مكان تبدأ منه — إحنا هنساعدك تعمل الـMatch الصح.','Whether you have a free space or need a place to start from — we will help you make the right match.'],
+
+  // FAQ
+  ['هل لازم أأجر العيادة شهر كامل؟','Do I have to rent the clinic for a full month?'],
+  ['لا، مش شرط. فيه أماكن متاحة بنظام أيام محددة في الأسبوع أو شيفت صباحي أو مسائي، وفيه أماكن تانية متاحة بس بشكل شهري كامل — بتقدر تفلتر بحسب احتياجك في صفحة "دوّر على عيادة".',
+    'No, not necessarily. Some places are available on specific days of the week or a morning/evening shift, while others are only available on a full monthly basis — you can filter by what you need on the "Find a Clinic" page.'],
+  ['هل ممكن أحجز أيام معينة فقط؟','Can I book only specific days?'],
+  ['أكيد، ده جزء من فكرة المنصة الأساسية. تقدر تحدد الأيام والشيفتات اللي تناسبك بالضبط وهنرشحلك الأماكن المتوافقة معاها.',
+    'Sure, that is a core part of the platform. You can specify exactly the days and shifts that suit you, and we will recommend places that match.'],
+  ['هل البيانات الشخصية بتظهر للطرف الآخر؟','Does the other side see my personal information?'],
+  ['لا. رقم الموبايل والبريد الإلكتروني وبيانات التواصل بتفضل مخفية بين الطرفين لحد ما فريق ClinicSpace يوافق على التوفيق وينسق موعد المعاينة.',
+    'No. Your phone number, email, and contact details stay hidden between both sides until the ClinicSpace team approves the match and arranges the viewing appointment.'],
+  ['إزاي بيتم الاتفاق؟','How is the agreement made?'],
+  ['بعد ما نرشحلك أفضل الأماكن، فريقنا بينسق معاينة للمكان، وبعد موافقة الطرفين بيتم التنسيق للتعاقد المباشر بينهم — المنصة بتتوسط في العملية وتساعد لحد التعاقد.',
+    'After we recommend the best places to you, our team arranges a viewing, and once both sides agree, we coordinate a direct agreement between them — the platform acts as an intermediary throughout the process, right up to the final agreement.'],
+  ['مين بيدفع العمولة؟','Who pays the commission?'],
+  ['العمولة بتُحدَّد بالتفاصيل ويتم الاتفاق عليها مع فريقنا حسب كل حالة، وبتُدفع مرة واحدة فقط بعد نجاح التوفيق وقبل إتمام التعاقد النهائي.',
+    'The commission details are agreed upon with our team on a case-by-case basis, and it is paid only once, after a successful match and before the final agreement is completed.'],
+  ['هل كل العيادات مجهزة بالكامل؟','Are all clinics fully equipped?'],
+  ['لا، بتختلف من مكان لمكان. كل إعلان بيوضح المرافق العامة والتجهيزات الطبية المتاحة بالتفصيل، وممكن تفلتر في صفحة "دوّر على عيادة" على المرافق اللي محتاجها بالضبط.',
+    'No, it varies from place to place. Each listing details the general amenities and medical equipment available, and you can filter on the "Find a Clinic" page for exactly the amenities you need.'],
+  ['هل ','Is '],
+  [' طرف في عقد الإيجار؟',' a party to the rental contract?'],
+  ['لا، ','No, '],
+  [' وسيط للتوفيق بين الطرفين فقط ولا تُعتبر طرفًا في عقد الإيجار أو الاستخدام النهائي. العقد بيتم مباشرة بين الدكتور وصاحب المكان بعد التنسيق.',
+    ' is only an intermediary matching both sides and is not considered a party to the rental or usage contract. The contract is made directly between the doctor and the space owner after coordination.'],
+  ['هل ممكن أعرض أكتر من غرفة أو مكان؟','Can I list more than one room or place?'],
+  ['أكيد، تقدر تسجّل أكتر من مساحة، وكل مكان بيكون له بيانات وحالة مراجعة مستقلة في لوحة تحكمك.','Sure, you can register more than one space, and each place will have its own details and review status in your dashboard.'],
+  ['هل ممكن أغيّر الأيام المتاحة بعد النشر؟','Can I change the available days after publishing?'],
+  ['نعم، تقدر تحدّث الأيام والشيفتات المتاحة في أي وقت من لوحة تحكم صاحب المساحة، أو بالتواصل مباشرة مع فريق الدعم.','Yes, you can update the available days and shifts anytime from the space owner dashboard, or by contacting our support team directly.'],
+  ['لسه عندك سؤال؟ ','Still have a question? '],
+  ['الأسئلة الشائعة','FAQ'],
+  ['كل اللي محتاج تعرفه عن ','Everything you need to know about '],
+  [' قبل ما تبدأ.',' before you start.'],
+
+  // How it works page
+  ['العملية بسيطة ومنظمة، وفريقنا بيكون موجود في كل خطوة لحد ما يتم التوفيق الصحيح.','The process is simple and organized, and our team is with you every step until the right match is made.'],
+  ['فريقنا بيتحقق من البيانات ويتواصل معاك لو محتاجين أي تفاصيل إضافية.','Our team verifies your details and reaches out if we need anything else.'],
+  ['خوارزمية المطابقة بتقارن طلبك بكل الأماكن المتاحة وترشحلك الأنسب.','Our matching algorithm compares your request with all available places and recommends the best fit.'],
+  ['لو الطرفين موافقين، بننسق معاينة، وبعدها التعاقد المباشر بينكم.','If both sides agree, we arrange a viewing, followed by a direct agreement between you.'],
+  ['سجّل بيانات طلبك أو مساحتك بالتفاصيل المطلوبة.','Submit your request or space details with the required information.'],
+  ['رحلة الدكتور','The Doctor Journey'],
+  ['يسجّل طلبه بالتخصص والمنطقة والأيام والميزانية','Submits a request with specialty, area, days, and budget'],
+  ['يستقبل نتائج Matching فورية بنسبة توافق','Receives instant matching results with a compatibility score'],
+  ['يرسل "أنا مهتم" للمكان المناسب','Sends "I am interested" for the right place'],
+  ['فريقنا يراجع ويرسل بياناته لصاحب المكان بعد الموافقة','Our team reviews and sends their details to the space owner after approval'],
+  ['معاينة منسّقة، وبعدها التعاقد المباشر','A coordinated viewing, followed by a direct agreement'],
+  ['رحلة صاحب المساحة','The Space Owner Journey'],
+  ['يسجّل بيانات المكان والأيام والسعر','Submits the place details, days, and price'],
+  ['فريقنا يراجع البيانات ويضيف "علامة موثّقة" بعد التحقق','Our team reviews the details and adds a "Verified" badge after checking'],
+  ['يستقبل طلبات اهتمام من دكاترة مناسبين للتخصص والأيام','Receives interest from doctors matching the specialty and days'],
+  ['يراجع الطلبات من لوحة تحكمه','Reviews requests from their dashboard'],
+  ['يوافق على معاينة، وبعدها التعاقد المباشر','Approves a viewing, followed by a direct agreement'],
+  ['لسه عندك أسئلة؟','Still have questions?'],
+  ['شوف الأسئلة الشائعة','View FAQ'],
+
+  // About page
+  ['منصة مصرية بتحل مشكلة حقيقية في سوق العيادات الطبية.','An Egyptian platform solving a real problem in the medical clinic market.'],
+  ['قصتنا','Our Story'],
+  ['بدأت ClinicSpace من ملاحظة بسيطة: عيادات كتير في مصر فيها أيام أو شيفتات كاملة غير مستغلة، في نفس الوقت اللي فيه دكاترة كتير — خصوصًا في بداية مشوارهم أو اللي بيدوروا على مكان تجريبي — مضطرين يدفعوا تكلفة عيادة كاملة أو يفضلوا بدون مكان مناسب لشغلهم.',
+    'ClinicSpace started from a simple observation: many clinics in Egypt have entire days or shifts that go unused, while at the same time many doctors — especially those starting out or looking for a trial space — are forced to pay for a full clinic or go without a suitable place to work.'],
+  ['قررنا نبني منصة "Matching" متخصصة، مش موقع إعلانات عقارية عادي، بتفهم احتياجات كل طرف بالتفصيل — التخصص، الأيام، الميزانية، والتجهيزات — وتوصله بأنسب فرصة.',
+    'We decided to build a specialized "matching" platform, not just an ordinary property listings site, that understands the needs of each side in detail — specialty, days, budget, and equipment — and connects them to the best opportunity.'],
+  ['مهمتنا','Our Mission'],
+  ['نساعد كل عيادة تستغل مساحتها بالكامل، ونساعد كل دكتور يلاقي مكان يبدأ أو يوسّع بيه شغله من غير عبء تكلفة عيادة كاملة.',
+    'We help every clinic make full use of its space, and help every doctor find a place to start or grow their practice without the burden of a full clinic cost.'],
+  ['قيمنا','Our Values'],
+  ['الشفافية:','Transparency:'],
+  ['بيانات واضحة عن كل مكان، وعلامة "موثّقة" فقط للأماكن اللي بنراجعها فعليًا.','Clear details for every place, and a "Verified" badge only for places we have actually reviewed.'],
+  ['الخصوصية:','Privacy:'],
+  ['بيانات التواصل بتفضل مخفية بين الطرفين لحد ما يوافق فريقنا.','Contact details stay hidden between both sides until our team approves.'],
+  ['الجدية:','Seriousness:'],
+  ['بنركز على توفيق حقيقي بيوصل لتعاقد، مش أعداد إعلانات بس.','We focus on real matches that lead to an agreement, not just listing counts.'],
+  ['لسه في أول الطريق','Still Just Getting Started'],
+  ['عايز تكون من أول المستخدمين؟','Want to be one of the first users?'],
+
+  // Contact page
+  ['عندك سؤال أو اقتراح أو محتاج مساعدة؟ إحنا هنا.','Have a question, a suggestion, or need help? We are here.'],
+  [' (مثال تجريبي)',' (sample)'],
+  ['البريد الإلكتروني (اختياري)','Email (optional)'],
+  ['البريد الإلكتروني','Email'],
+  ['الموبايل / واتساب','Mobile / WhatsApp'],
+  ['نطاق العمل','Coverage Area'],
+  ['القاهرة الكبرى — في تطور مستمر','Greater Cairo — Continuously Expanding'],
+  ['الاسم','Name'],
+  ['الموبايل أو البريد الإلكتروني','Mobile or Email'],
+  ['اختر الموضوع','Select a subject'],
+  ['استفسار عام','General Inquiry'],
+  ['مشكلة في طلب مسجّل','Issue with a Submitted Request'],
+  ['شراكة أو تعاون','Partnership or Collaboration'],
+  ['ملاحظات على المنصة','Feedback on the Platform'],
+  ['الموضوع','Subject'],
+  ['رسالتك','Your Message'],
+  ['اكتب رسالتك هنا...','Write your message here...'],
+  ['إرسال الرسالة','Send Message'],
+  ['تم إرسال رسالتك','Your Message Has Been Sent'],
+  ['هيتواصل معاك فريقنا في أقرب وقت.','Our team will contact you as soon as possible.'],
+  ['حصل خطأ في إرسال الرسالة، حاول تاني.','An error occurred while sending the message. Please try again.'],
+
+  // List-space page
+  ['عندك عيادة أو غرفة مش مستغلة بالكامل؟','Do you have a clinic or room that is not fully utilized?'],
+  ['سجّل بيانات المساحة، وفريقنا هيراجعها ويبدأ يرشحلك دكاترة مناسبين لأيامك الفاضية.','Register your space details, and our team will review them and start recommending suitable doctors for your free days.'],
+  ['اسمك بالكامل','Full Name'],
+  ['رقم الموبايل','Mobile Number'],
+  ['مثال: د. أحمد سامي','e.g. Dr. Ahmed Samy'],
+  ['هيُستخدم فقط للتواصل من فريقنا، ولن يظهر للعامة','Used only for our team to contact you, and will not be shown publicly'],
+  ['اختر المنطقة','Select the area'],
+  ['اختر التخصص','Select the specialty'],
+  ['نوع المكان','Place Type'],
+  ['اختر النوع','Select the type'],
+  ['الفترة / الشيفت','Period / Shift'],
+  ['اختر الفترة','Select the period'],
+  ['السعر الشهري المطلوب (ج.م)','Requested Monthly Price (EGP)'],
+  ['التخصصات المناسبة للمكان','Specialties Suited to the Place'],
+  ['اختار تخصص واحد على الأقل','Choose at least one specialty'],
+  ['الأيام المتاحة','Available Days'],
+  ['اختار يوم واحد على الأقل، أو سيبها فاضية لو مرن','Choose at least one day, or leave it empty if you are flexible'],
+  ['اختار يوم واحد على الأقل','Choose at least one day'],
+  ['المرافق العامة المتوفرة','General Amenities Available'],
+  ['المرافق والتجهيزات الطبية المتوفرة','Medical Facilities & Equipment Available'],
+  ['وصف مختصر للمساحة','Short Description of the Space'],
+  ['اكتب وصف قصير عن المكان، الموقع، والتجهيزات...','Write a short description of the place, its location, and equipment...'],
+  ['موافق على ','I agree to the '],
+  [' وعلى إن ',' and that '],
+  [' تتوسط في عملية التوفيق كطرف وسيط فقط.',' acts only as an intermediary in the matching process.'],
+  ['لازم توافق على الشروط والأحكام أولًا','You must agree to the Terms and Conditions first'],
+  ['مطلوب تعبئة هذا الحقل','This field is required'],
+  ['جاري الإرسال...','Submitting...'],
+  ['تم استلام بيانات مساحتك!','Your space details have been received!'],
+  ['فريقنا هيراجع البيانات ويتحقق منها خلال ٤٨ ساعة، وبعدها هتبدأ تستقبل ترشيحات دكاترة مناسبين.','Our team will review and verify the details within 48 hours, after which you will start receiving recommendations of suitable doctors.'],
+  ['احتفظ بالكود ده — هتستخدمه للدخول على لوحة تحكم المساحة بتاعتك.','Keep this code — you will use it to log into your space dashboard.'],
+  ['روح لوحة التحكم','Go to Dashboard'],
+  ['حصل خطأ في إرسال البيانات، حاول تاني.','An error occurred while submitting the data. Please try again.'],
+
+  // Need-clinic page
+  ['اشتغل من عيادة مجهزة في المكان والأيام اللي تناسبك','Work from a fully equipped clinic in the place and on the days that suit you'],
+  ['سجّل بياناتك، وفريقنا هيراجع طلبك ويتواصل معاك بأنسب الأماكن المتاحة حسب تخصصك وميزانيتك.','Submit your details, and our team will review your request and get in touch with the best available places based on your specialty and budget.'],
+  ['مثال: د. مروة عادل','e.g. Dr. Marwa Adel'],
+  ['هيُستخدم فقط للتواصل من فريقنا','Used only for our team to contact you'],
+  ['تخصصك الطبي','Your Medical Specialty'],
+  ['المنطقة المفضلة','Preferred Area'],
+  ['أي منطقة','Any Area'],
+  ['نوع الإيجار المطلوب','Requested Rental Type'],
+  ['الميزانية الشهرية القصوى (ج.م)','Maximum Monthly Budget (EGP)'],
+  ['الخدمات والمرافق المطلوبة','Required Services & Amenities'],
+  ['ملاحظات إضافية (اختياري)','Additional Notes (optional)'],
+  ['أي تفاصيل تانية تساعدنا نرشحلك مكان أدق...','Any other details that help us recommend a more precise match...'],
+  ['أرسل طلبك','Submit Your Request'],
+  ['تم استلام طلبك بنجاح!','Your request was received successfully!'],
+  ['فريقنا هيراجع طلبك ويرشحلك أنسب الأماكن المتاحة حسب تخصصك وميزانيتك وأيامك، وهيتواصل معاك على رقم الموبايل اللي كتبته خلال ٤٨ ساعة.',
+    'Our team will review your request and recommend the best matching places based on your specialty, budget, and days, and will contact you on the mobile number you provided within 48 hours.'],
+  ['احتفظ بالكود ده لمتابعة حالة طلبك من لوحة تحكم الدكتور.','Keep this code to track your request status from the doctor dashboard.'],
+  ['تعديل الطلب / طلب جديد','Edit Request / New Request'],
+
+  // Match card (legacy)
+  ['أنا مهتم','I am interested'],
+  ['التفاصيل','Details'],
+  [' ج.م/شهريًا',' EGP/month'],
+  [' ج.م / شهريًا',' EGP / month'],
+  [' ج.م',' EGP'],
+
+  // Login / register
+  ['ادخل كود التتبع اللي استلمته بعد تسجيل طلبك أو مساحتك.','Enter the tracking code you received after registering your request or space.'],
+  ['دخول','Login'],
+  ['لسه معملتش طلب؟ ','Have not made a request yet? '],
+  ['من فضلك اكتب كود التتبع','Please enter the tracking code'],
+  ['جاري التحقق...','Verifying...'],
+  ['لم نلاقِ بيانات بهذا الكود. تأكد إنه صحيح.','We could not find any data with this code. Please make sure it is correct.'],
+  ['حصل خطأ في الاتصال، حاول تاني.','A connection error occurred. Please try again.'],
+  ['اختار الوصف اللي يناسبك، وهنوجّهك لطلب التسجيل المناسب في دقيقتين.','Choose the description that fits you, and we will guide you to the right registration in two minutes.'],
+  ['سجّل تخصصك واحتياجاتك وهنرشحلك أماكن فورًا.','Register your specialty and needs, and we will recommend places instantly.'],
+  ['ابدأ التسجيل','Start Registration'],
+  ['سجّل بيانات مساحتك وابدأ تستقبل ترشيحات دكاترة.','Register your space details and start receiving doctor recommendations.'],
+  ['عندك كود تتبع بالفعل؟ ','Already have a tracking code? '],
+  ['سجّل الدخول من هنا','Log in here'],
+
+  // Doctor dashboard
+  ['لوحة تحكم الدكتور','Doctor Dashboard'],
+  ['أهلًا، ','Hello, '],
+  ['قيد المراجعة','Under Review'],
+  ['خروج','Logout'],
+  ['كود التتبع','Tracking Code'],
+  ['التخصص','Specialty'],
+  ['الميزانية القصوى','Maximum Budget'],
+  ['طلبك تحت المراجعة','Your Request Is Under Review'],
+  ['فريقنا بيراجع بياناتك ويدوّر على أنسب الأماكن المتاحة، وهيتواصل معاك على رقم الموبايل اللي سجّلته بمجرد ما يكون في ترشيح مناسب.',
+    'Our team is reviewing your details and looking for the best available places, and will contact you on the mobile number you registered as soon as a suitable match is found.'],
+  ['عايز تعدّل طلبك؟','Want to edit your request?'],
+  ['تقدر تلغي الطلب الحالي وتسجّل طلب جديد بمواصفات مختلفة.','You can cancel your current request and submit a new one with different requirements.'],
+  ['إلغاء الطلب','Cancel Request'],
+  ['تم إلغاء الطلب','Request Cancelled'],
+  ['حصل خطأ، حاول تاني.','An error occurred. Please try again.'],
+
+  // Owner dashboard
+  ['لوحة تحكم صاحب المساحة','Space Owner Dashboard'],
+  ['موثّقة','Verified'],
+  ['السعر الشهري (ج.م)','Monthly Price (EGP)'],
+  ['أيام متاحة','Available Days'],
+  ['دكاترة مهتمين','Interested Doctors'],
+  ['بيانات المساحة','Space Details'],
+  ['الدكاترة المهتمين','Interested Doctors'],
+  [' — لسه محدش أبدى اهتمام',' — No one has shown interest yet'],
+  ['تاريخ الاهتمام','Date of Interest'],
+  ['الحالة','Status'],
+  ['بيانات مخفية حتى موافقة الفريق','Details hidden until team approval'],
+  ['بمجرد ما دكتور يهتم بمساحتك، هيظهر هنا (مع إخفاء بياناته الشخصية لحد موافقة فريقنا).','As soon as a doctor shows interest in your space, they will appear here (with their personal details hidden until our team approves).'],
+  ['عندك مساحة تانية فاضية؟','Have another free space?'],
+  ['تقدر تسجّل أكتر من مكان بأكواد تتبع مختلفة.','You can register more than one place with different tracking codes.'],
+  ['أضف مساحة جديدة','Add New Space'],
+  ['محتاج كود التتبع','Tracking Code Required'],
+  ['من فضلك دخول بكود التتبع بتاعك لعرض لوحة التحكم.','Please log in with your tracking code to view the dashboard.'],
+
+  // Admin
+  ['لوحة داخلية لفريق العمل فقط.','Internal dashboard for staff only.'],
+  ['كلمة المرور','Password'],
+  ['اكتب كلمة المرور','Please enter the password'],
+  ['كلمة المرور غير صحيحة','Incorrect password'],
+  ['جاري تحميل بيانات لوحة التحكم...','Loading dashboard data...'],
+  ['انتهت الجلسة، سجّل دخولك تاني','Session expired, please log in again'],
+  ['حصل خطأ في تحميل بيانات لوحة التحكم. حاول تحدّث الصفحة.','An error occurred while loading the dashboard data. Please try refreshing the page.'],
+  ['البيانات هنا محفوظة في قاعدة بيانات مركزية حقيقية يشاركها كل الزوار والفريق مباشرة.','This data is stored in a real central database shared live by all visitors and the team.'],
+  ['إجمالي المساحات','Total Spaces'],
+  ['مساحات قيد المراجعة','Spaces Under Review'],
+  ['طلبات دكاترة','Doctor Requests'],
+  ['رسائل تواصل','Contact Messages'],
+  ['طلبات الدكاترة','Doctor Requests'],
+  ['رسائل التواصل','Contact Messages'],
+  ['المساحات','Spaces'],
+  ['المكان','Place'],
+  ['السعر','Price'],
+  ['مصدر','Source'],
+  ['إجراء','Action'],
+  ['بيانات تجريبية','Sample Data'],
+  ['مُقدَّم من مستخدم','Submitted by User'],
+  ['بيانات التواصل: ','Contact Information: '],
+  ['بيانات التواصل','Contact Information'],
+  ['رقم التواصل','Phone Number'],
+  ['كود التتبع','Tracking Code'],
+  ['اسم صاحب المكان','Space Owner Name'],
+  ['الوصف اللي كتبه','Description They Wrote'],
+  ['إغلاق','Close'],
+  ['تعديل: ','Edit: '],
+  ['اسم المكان','Place Name'],
+  ['موثّقة ومعروضة للزوار','Verified and shown to visitors'],
+  ['حفظ التعديلات','Save Changes'],
+  ['إلغاء','Cancel'],
+  ['اتحفظت التعديلات.','Changes saved.'],
+  ['تعديل','Edit'],
+  ['حذف','Delete'],
+  ['متأكد إنك عايز تحذف "','Are you sure you want to delete "'],
+  ['" نهائيًا؟ الإجراء ده مش هيتراجع.','"? This action cannot be undone.'],
+  ['اتحذفت.','Deleted.'],
+  ['أفضل Match','Best Match'],
+  ['لسه مفيش طلبات دكاترة مسجّلة.','No doctor requests registered yet.'],
+  ['متأكد إنك عايز تحذف طلب "','Are you sure you want to delete the request "'],
+  ['" نهائيًا؟','"?'],
+  ['اتحذف.','Deleted.'],
+  ['ملاحظات الطلب','Request Notes'],
+  ['الرسالة','Message'],
+  ['لسه مفيش رسائل تواصل.','No contact messages yet.'],
+  ['متأكد إنك عايز تحذف رسالة "','Are you sure you want to delete the message "'],
+  ['الاسم','Name'],
+  ['التواصل','Contact'],
+  ['مرحبًا بفريق ','Welcome, '],
+  ['لوحة تحكم الأدمن','Admin Dashboard'],
+  ['دخول فريق ','Team Login for '],
+
+  // Privacy / Terms
+  ['آخر تحديث: ','Last updated: '],
+  ['هذا نص نموذجي مبدئي لأغراض النسخة التجريبية (MVP)، وننصح بمراجعته مع مستشار قانوني قبل الإطلاق الرسمي للمنصة.','This is a preliminary sample text for the experimental (MVP) version, and we recommend reviewing it with a legal consultant before the official launch of the platform.'],
+  ['البيانات اللي بنجمعها','The Data We Collect'],
+  ['بنجمع البيانات اللي بتقدمها بنفسك عند التسجيل أو تقديم طلب، ومنها: الاسم، رقم الموبايل، البريد الإلكتروني، وبيانات المكان أو الطلب (المنطقة، التخصص، الأيام، الميزانية، وتفاصيل المساحة).',
+    'We collect the data you provide yourself when registering or submitting a request, including: name, mobile number, email, and details of the place or request (area, specialty, days, budget, and space details).'],
+  ['الغرض من استخدام البيانات','Purpose of Using the Data'],
+  ['بنستخدم بياناتك فقط لتسهيل عملية التوفيق (Matching) بينك وبين الطرف الآخر المناسب، والتواصل معاك بخصوص طلبك، وتحسين جودة الخدمة.',
+    'We use your data only to facilitate the matching process between you and the right other party, to contact you regarding your request, and to improve the quality of the service.'],
+  ['مشاركة بيانات التواصل','Sharing Contact Details'],
+  ['رقم الموبايل والبريد الإلكتروني وبيانات التواصل المباشرة ','Your mobile number, email, and direct contact details '],
+  ['لا تُعرض للطرف الآخر إطلاقًا','are never shown to the other party'],
+  [' إلا بعد موافقة فريق ',' except after approval from the '],
+  [' وتنسيق عملية المعاينة بين الطرفين.',' team and coordination of the viewing process between both parties.'],
+  ['تخزين البيانات','Data Storage'],
+  ['بياناتك بتُخزَّن في قاعدة بيانات مركزية آمنة، ومحمية بإجراءات تحكم في الوصول بحيث إن بيانات التواصل المباشرة (الاسم، الموبايل، البريد الإلكتروني) لا يقدر يشوفها إلا فريق ',
+    'Your data is stored in a secure central database, protected by access-control measures so that direct contact details (name, mobile, email) can only be seen by the '],
+  [' المصرّح له.',' authorized team.'],
+  ['عدم بيع البيانات','We Do Not Sell Your Data'],
+  [' لا تبيع ولا تؤجر بياناتك الشخصية لأي طرف ثالث لأغراض تسويقية.',' does not sell or rent your personal data to any third party for marketing purposes.'],
+  ['حقوقك','Your Rights'],
+  ['تقدر تطلب في أي وقت مراجعة أو تعديل أو حذف بياناتك عن طريق التواصل معنا من ','You can request at any time to review, modify, or delete your data by contacting us from the '],
+  ['صفحة التواصل','Contact Page'],
+  ['تحديث السياسة','Updating This Policy'],
+  ['ممكن نحدّث هذه السياسة من وقت لآخر مع تطور المنصة، وهنوضح أي تغييرات جوهرية على الصفحة ده.','We may update this policy from time to time as the platform evolves, and we will highlight any material changes on this page.'],
+  ['لأي استفسار يخص الخصوصية، تواصل معنا على ','For any privacy inquiries, contact us at '],
+  ['طبيعة الخدمة','Nature of the Service'],
+  [' منصة وسيطة (Broker) بتربط بين الدكاترة المحتاجين مساحات طبية وأصحاب العيادات أو المراكز اللي عندهم مساحات أو أوقات غير مستغلة. المنصة ',
+    ' is a brokerage platform connecting doctors who need medical spaces with clinic or center owners who have unused space or time. The platform '],
+  ['ليست طرفًا في أي عقد إيجار أو استخدام','is not a party to any rental or usage contract'],
+  [' يتم التوصل إليه بين المستخدمين.',' reached between users.'],
+  ['العمولة','Commission'],
+  ['نموذج العمل الحالي هو عمولة توفيق تُدفع مرة واحدة بعد نجاح التوفيق بين الطرفين. تُحدَّد نسبة أو قيمة العمولة والجهة المسؤولة عن دفعها بالتفاصيل مع فريق ',
+    'The current business model is a matching commission paid once after a successful match between both parties. The commission rate or amount, and who is responsible for paying it, are agreed upon in detail with the '],
+  [' قبل إتمام التعاقد النهائي. لا يوجد دفع أونلاين عبر المنصة في النسخة الحالية.',' team before finalizing the agreement. There is no online payment through the platform in the current version.'],
+  ['مسؤولية دقة البيانات','Responsibility for Data Accuracy'],
+  ['يتحمّل كل مستخدم مسؤولية دقة البيانات اللي بيقدمها (بيانات المكان، التخصص، الأيام، الأسعار). ','Each user is responsible for the accuracy of the data they provide (place details, specialty, days, prices). '],
+  [' بتراجع البيانات قبل النشر لكنها لا تضمن اكتمال كل التفاصيل بدون تحقق مباشر من الطرفين.',' reviews the data before publishing but does not guarantee the completeness of every detail without direct verification from both parties.'],
+  ['علامة "موثّقة"','The "Verified" Badge'],
+  ['علامة "موثّقة" تعني إن فريقنا راجع البيانات الأساسية للمكان، ولا تعني ضمانًا قانونيًا كاملًا لحالة العيادة أو ترخيصها. يُنصح دائمًا بمعاينة المكان بنفسك قبل التعاقد.',
+    'The "Verified" badge means our team has reviewed the basic details of the place, and does not imply a full legal guarantee of the clinic status or licensing. It is always recommended to view the place yourself before signing an agreement.'],
+  ['الإلغاء','Cancellation'],
+  ['يمكن لأي مستخدم إلغاء طلبه أو عرض مساحته في أي وقت قبل إتمام التعاقد، من لوحة التحكم الخاصة به أو بالتواصل مع فريق الدعم.','Any user can cancel their request or space listing at any time before finalizing an agreement, from their dashboard or by contacting the support team.'],
+  ['حدود المسؤولية','Limitation of Liability'],
+  [' غير مسؤولة عن أي خلافات تنشأ بعد التعاقد المباشر بين الطرفين، وتقتصر مسؤوليتها على عملية التوفيق والتنسيق قبل التعاقد.',' is not responsible for any disputes arising after the direct agreement between both parties, and its responsibility is limited to the matching and coordination process before the agreement.'],
+  ['القانون الحاكم','Governing Law'],
+  ['تخضع هذه الشروط لقوانين جمهورية مصر العربية.','These terms are governed by the laws of the Arab Republic of Egypt.'],
+  ['لأي استفسار يخص هذه الشروط، تواصل معنا على ','For any inquiries regarding these terms, contact us at '],
+
+  // 404
+  ['الصفحة غير موجودة','Page Not Found'],
+  ['جرب الرجوع للرئيسية.','Try going back to the home page.'],
+
+  // Districts / governorates
+  ['الشيخ زايد','Sheikh Zayed'],
+  ['٦ أكتوبر','6th of October'],
+  ['المهندسين','Mohandessin'],
+  ['الدقي','Dokki'],
+  ['مدينة نصر','Nasr City'],
+  ['مصر الجديدة','Heliopolis'],
+  ['المعادي','Maadi'],
+  ['القاهرة الجديدة','New Cairo'],
+  ['التجمع الأول','First Settlement'],
+  ['التجمع الخامس','Fifth Settlement'],
+  ['القاهرة','Cairo'],
+  ['الجيزة','Giza'],
+
+  // Specialties
+  ['تغذية علاجية','Clinical Nutrition'],
+  ['نفسي وعلاج سلوكي','Psychiatry & Behavioral Therapy'],
+  ['جلدية','Dermatology'],
+  ['تغذية','Nutrition'],
+  ['نفسي','Psych'],
+  ['باطنة','Internal Medicine'],
+  ['أسنان','Dentistry'],
+  ['عظام','Orthopedics'],
+  ['أطفال','Pediatrics'],
+  ['نساء وتوليد','Obstetrics & Gynecology'],
+  ['عيون','Ophthalmology'],
+  ['أنف وأذن وحنجرة','ENT'],
+  ['مسالك بولية','Urology'],
+  ['قلب وأوعية دموية','Cardiology'],
+  ['جهاز هضمي','Gastroenterology'],
+  ['تخسيس ونحت','Weight Loss & Body Contouring'],
+  ['علاج طبيعي','Physical Therapy'],
+  ['تخاطب','Speech Therapy'],
+
+  // Days
+  ['السبت','Saturday'],
+  ['الأحد','Sunday'],
+  ['الإتنين','Monday'],
+  ['التلات','Tuesday'],
+  ['الأربع','Wednesday'],
+  ['الخميس','Thursday'],
+  ['الجمعة','Friday'],
+
+  // Shifts / rental types / clinic types
+  ['صباحي (٩ص – ٤م)','Morning (9am – 4pm)'],
+  ['مسائي (٤م – ١٠م)','Evening (4pm – 10pm)'],
+  ['مرن حسب الاتفاق','Flexible, By Agreement'],
+  ['يوم كامل','Full Day'],
+  ['أيام محددة أسبوعيًا','Specific Days Weekly'],
+  ['شيفت صباحي','Morning Shift'],
+  ['شيفت مسائي','Evening Shift'],
+  ['شهري','Monthly'],
+  ['مرن','Flexible'],
+  ['عيادة كاملة مجهزة','Fully Equipped Clinic'],
+  ['غرفة داخل مركز طبي','Room Inside a Medical Center'],
+  ['غرفة داخل عيادة قائمة','Room Inside an Existing Clinic'],
+  ['مساحة مشتركة (كو-وركينج طبي)','Shared Space (Medical Co-working)'],
+
+  // Facilities
+  ['استقبال','Reception'],
+  ['صالة انتظار','Waiting Area'],
+  ['سكرتارية','Secretary'],
+  ['واي فاي','Wi-Fi'],
+  ['تكييف','Air Conditioning'],
+  ['مصعد','Elevator'],
+  ['باركينج','Parking'],
+  ['حمام','Restroom'],
+  ['خدمة نظافة','Cleaning Service'],
+  ['أمن','Security'],
+  ['مناسب لذوي الهمم','Accessible for People with Disabilities'],
+  ['سرير كشف','Examination Bed'],
+  ['حوض غسيل','Sink'],
+  ['تعقيم','Sterilization'],
+  ['تخزين طبي','Medical Storage'],
+  ['أجهزة متاحة للاستخدام','Equipment Available for Use'],
+
+  // Generic fallbacks (short — checked last)
+  ['مثال: ','e.g. '],
+  ['نعم، ','Yes, '],
+  ['نعم.','Yes.'],
+  ['أكيد،','Sure,'],
+  ['لا.','No.'],
+  ['؟','?'],
+  ['،',','],
+  ['٠','0'],['١','1'],['٢','2'],['٣','3'],['٤','4'],['٥','5'],['٦','6'],['٧','7'],['٨','8'],['٩','9']
+];
+var DICT_SORTED = DICT_RAW.slice().sort(function(a,b){ return b[0].length - a[0].length; });
+function translateStr(s){
+  if(LANG!=='en' || !s) return s;
+  var out = s;
+  for(var i=0;i<DICT_SORTED.length;i++){
+    if(out.indexOf(DICT_SORTED[i][0]) !== -1) out = out.split(DICT_SORTED[i][0]).join(DICT_SORTED[i][1]);
+  }
+  return out;
+}
+var I18N_ATTRS = ['placeholder','title'];
+function translateElAttrs(el){
+  for(var i=0;i<I18N_ATTRS.length;i++){
+    var a = I18N_ATTRS[i];
+    if(el.hasAttribute && el.hasAttribute(a)){
+      var v = el.getAttribute(a), t = translateStr(v);
+      if(t!==v) el.setAttribute(a,t);
+    }
+  }
+}
+function translateNodeDeep(node){
+  if(!node) return;
+  if(node.nodeType===3){
+    var t = translateStr(node.nodeValue);
+    if(t!==node.nodeValue) node.nodeValue = t;
+    return;
+  }
+  if(node.nodeType===1){
+    translateElAttrs(node);
+    for(var i=0;i<node.childNodes.length;i++) translateNodeDeep(node.childNodes[i]);
+  }
+}
+var _i18nObserver = null;
+function startI18nObserver(){
+  if(_i18nObserver) return;
+  _i18nObserver = new MutationObserver(function(muts){
+    if(LANG!=='en') return;
+    for(var i=0;i<muts.length;i++){
+      var m = muts[i];
+      if(m.type==='childList'){
+        for(var j=0;j<m.addedNodes.length;j++) translateNodeDeep(m.addedNodes[j]);
+      } else if(m.type==='characterData'){
+        var t = translateStr(m.target.nodeValue);
+        if(t!==m.target.nodeValue) m.target.nodeValue = t;
+      } else if(m.type==='attributes'){
+        translateElAttrs(m.target);
+      }
+    }
+  });
+  _i18nObserver.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:I18N_ATTRS});
+}
+function setLang(newLang){
+  if(newLang!=='en' && newLang!=='ar') return;
+  LANG = newLang;
+  try{ localStorage.setItem('cs_lang', LANG); }catch(e){}
+  document.documentElement.setAttribute('lang', LANG==='en'?'en':'ar');
+  document.documentElement.setAttribute('dir', LANG==='en'?'ltr':'rtl');
+  renderShell();
+  render();
+}
 
 /* ===================== ICONS (inline SVG, stroke-based) ===================== */
 function icon(name){
@@ -667,7 +1254,7 @@ function listingCard(l){
 }
 function toast(msg){
   var t = document.getElementById('toastMsg');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = translateStr(msg); t.classList.add('show');
   clearTimeout(window.__toastTimer);
   window.__toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
 }
@@ -736,7 +1323,10 @@ window.addEventListener('hashchange', render);
 
 /* ===================== SHELL: HEADER + FOOTER ===================== */
 function renderShell(){
+  var oldHeader = document.getElementById('siteHeader'); if(oldHeader) oldHeader.remove();
+  var oldFooter = document.getElementById('siteFooter'); if(oldFooter) oldFooter.remove();
   var header = document.createElement('header');
+  header.id = 'siteHeader';
   header.className = 'site-header';
   header.innerHTML =
     '<div class="nav-inner">'+
@@ -750,15 +1340,19 @@ function renderShell(){
         '<a href="#/contact" data-key="contact">تواصل معنا</a>'+
       '</nav>'+
       '<div class="nav-actions">'+
-        '<button class="nav-lang" title="النسخة الإنجليزية قريبًا">EN</button>'+
+        '<button class="nav-lang" id="langToggleBtn" type="button" title="Language / اللغة">'+(LANG==='en'?'عربي':'EN')+'</button>'+
         '<a href="#/login" class="btn btn-ghost btn-sm">تسجيل الدخول</a>'+
         '<a href="#/register" class="btn btn-primary btn-sm">سجّل دلوقتي</a>'+
         '<button class="menu-toggle" id="menuToggle">'+icon('menu')+'</button>'+
       '</div>'+
     '</div>';
   document.body.insertBefore(header, document.getElementById('app'));
+  document.getElementById('langToggleBtn').addEventListener('click', function(){
+    setLang(LANG==='en'?'ar':'en');
+  });
 
   var footer = document.createElement('footer');
+  footer.id = 'siteFooter';
   footer.className = 'site-footer';
   footer.innerHTML =
     '<div class="wrap">'+
@@ -1341,7 +1935,7 @@ register('login', function(root){
       '<div class="brand" style="justify-content:center;margin-bottom:6px;"><div class="brand-mark">'+BRAND.mark+'</div></div>'+
       '<h2 style="margin-top:10px;font-size:22px;">تسجيل الدخول</h2>'+
       '<p class="muted" style="margin-top:8px;font-size:14px;">ادخل كود التتبع اللي استلمته بعد تسجيل طلبك أو مساحتك.</p>'+
-      '<div class="field" style="margin-top:20px;text-align:right;"><input type="text" id="loginCode" placeholder="مثال: CS-DOC-12345"></div>'+
+      '<div class="field" style="margin-top:20px;text-align:start;"><input type="text" id="loginCode" placeholder="مثال: CS-DOC-12345"></div>'+
       '<div id="loginErr" class="muted" style="color:var(--danger);font-size:13px;margin-top:8px;display:none;"></div>'+
       '<button class="btn btn-primary btn-block" id="loginBtn" style="margin-top:16px;">دخول</button>'+
       '<p class="hint" style="margin-top:16px;">لسه معملتش طلب؟ <a href="#/register" style="color:var(--teal-dark);text-decoration:underline;">سجّل دلوقتي</a></p>'+
@@ -1480,7 +2074,7 @@ register('dashboard-owner', async function(root, r){
 function dashLoginPrompt(kind){
   return '<div class="section container"><div class="card passcode-box">'+icon('lock')+
     '<h3 style="margin-top:12px;">محتاج كود التتبع</h3><p class="muted" style="font-size:13.5px;margin-top:8px;">من فضلك دخول بكود التتبع بتاعك لعرض لوحة التحكم.</p>'+
-    '<div class="field" style="margin-top:16px;text-align:right;"><input type="text" id="dashCode" placeholder="مثال: CS-'+(kind==='owner'?'OWN':'DOC')+'-12345"></div>'+
+    '<div class="field" style="margin-top:16px;text-align:start;"><input type="text" id="dashCode" placeholder="مثال: CS-'+(kind==='owner'?'OWN':'DOC')+'-12345"></div>'+
     '<button class="btn btn-primary btn-block" id="dashLoginBtn" style="margin-top:14px;">دخول</button>'+
     '<p class="hint" style="margin-top:14px;">لسه معملتش طلب؟ <a href="#/'+(kind==='owner'?'list-space':'need-clinic')+'" style="color:var(--teal-dark);text-decoration:underline;">سجّل دلوقتي</a></p>'+
     '</div></div>';
@@ -1501,7 +2095,7 @@ register('admin', function(root){
     root.innerHTML =
     '<div class="section container"><div class="card passcode-box">'+icon('lock')+
       '<h3 style="margin-top:12px;">دخول فريق '+BRAND.name+'</h3><p class="muted" style="font-size:13.5px;margin-top:8px;">لوحة داخلية لفريق العمل فقط.</p>'+
-      '<div class="field" style="margin-top:16px;text-align:right;"><input type="password" id="adminPass" placeholder="كلمة المرور"></div>'+
+      '<div class="field" style="margin-top:16px;text-align:start;"><input type="password" id="adminPass" placeholder="كلمة المرور"></div>'+
       '<button class="btn btn-primary btn-block" id="adminLoginBtn" style="margin-top:14px;">دخول</button>'+
     '</div></div>';
     document.getElementById('adminLoginBtn').addEventListener('click', function(){
@@ -1627,7 +2221,7 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
       body.querySelectorAll('[data-del-listing]').forEach(function(btn){
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-del-listing'); var title = btn.getAttribute('data-del-title');
-          if(!confirm('متأكد إنك عايز تحذف "'+title+'" نهائيًا؟ الإجراء ده مش هيتراجع.')) return;
+          if(!confirm(translateStr('متأكد إنك عايز تحذف "'+title+'" نهائيًا؟ الإجراء ده مش هيتراجع.'))) return;
           btn.disabled = true;
           callApi('admin_delete', {table:'listings', id:id, pass:pass}).then(function(){
             toast('اتحذفت.');
@@ -1660,7 +2254,7 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
       body.querySelectorAll('[data-del-request]').forEach(function(btn){
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-del-request'); var title = btn.getAttribute('data-del-title');
-          if(!confirm('متأكد إنك عايز تحذف طلب "'+title+'" نهائيًا؟')) return;
+          if(!confirm(translateStr('متأكد إنك عايز تحذف طلب "'+title+'" نهائيًا؟'))) return;
           btn.disabled = true;
           callApi('admin_delete', {table:'requests', id:id, pass:pass}).then(function(){
             toast('اتحذف.');
@@ -1675,7 +2269,7 @@ function renderAdminPanelBody(root, pass, listings, requests, contacts){
       body.querySelectorAll('[data-del-contact]').forEach(function(btn){
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-del-contact'); var title = btn.getAttribute('data-del-title');
-          if(!confirm('متأكد إنك عايز تحذف رسالة "'+title+'" نهائيًا؟')) return;
+          if(!confirm(translateStr('متأكد إنك عايز تحذف رسالة "'+title+'" نهائيًا؟'))) return;
           btn.disabled = true;
           callApi('admin_delete', {table:'contacts', id:id, pass:pass}).then(function(){
             toast('اتحذفت.');
@@ -1730,6 +2324,7 @@ register('terms', function(root){
 register('notfound', function(root){ root.innerHTML = '<div class="section container center"><h2>الصفحة غير موجودة</h2><p class="muted" style="margin-top:10px;">جرب الرجوع للرئيسية.</p><a href="#/" class="btn btn-primary" style="margin-top:20px;">الرئيسية</a></div>'; });
 
 /* ===================== INIT ===================== */
+startI18nObserver();
 renderShell();
 render();
 
