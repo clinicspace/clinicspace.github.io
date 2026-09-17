@@ -739,7 +739,7 @@ function renderShell(){
       '<div class="brand" data-go=""><div class="brand-mark">'+BRAND.mark+'</div><span>'+BRAND.name+'</span></div>'+
       '<nav class="nav-links">'+
         '<a href="#/" data-key="home">الرئيسية</a>'+
-        '<a href="#/find" data-key="find">دوّر على عيادة</a>'+
+        '<a href="#/need-clinic" data-key="need-clinic">دوّر على عيادة</a>'+
         '<a href="#/list-space" data-key="list-space">عندي مساحة</a>'+
         '<a href="#/how-it-works" data-key="how-it-works">إزاي بتشتغل</a>'+
         '<a href="#/faq" data-key="faq">الأسئلة الشائعة</a>'+
@@ -767,7 +767,7 @@ function renderShell(){
         '<li><a href="#/">الرئيسية</a></li><li><a href="#/how-it-works">إزاي بتشتغل</a></li><li><a href="#/faq">الأسئلة الشائعة</a></li><li><a href="#/about">من نحن</a></li>'+
       '</ul></div>'+
       '<div class="footer-cols"><h5>حسابك</h5><ul>'+
-        '<li><a href="#/login">تسجيل الدخول</a></li><li><a href="#/register">التسجيل</a></li><li><a href="#/find">دوّر على عيادة</a></li><li><a href="#/list-space">عندي مساحة</a></li>'+
+        '<li><a href="#/login">تسجيل الدخول</a></li><li><a href="#/register">التسجيل</a></li><li><a href="#/need-clinic">دوّر على عيادة</a></li><li><a href="#/list-space">عندي مساحة</a></li>'+
       '</ul></div>'+
       '<div class="footer-cols"><h5>قانوني وتواصل</h5><ul>'+
         '<li><a href="#/contact">تواصل معنا</a></li><li><a href="#/privacy">سياسة الخصوصية</a></li><li><a href="#/terms">الشروط والأحكام</a></li>'+
@@ -799,7 +799,7 @@ register('home', function(root){
         '<h1 style="margin-top:18px;">'+BRAND.tagline+'</h1>'+
         '<p class="hero-sub">منصة بتساعد الدكاترة يلاقوا عيادات وغرف طبية مجهزة بالأيام والمواعيد المناسبة ليهم، وبتساعد أصحاب العيادات يستفيدوا من المساحات والأوقات غير المستغلة.</p>'+
         '<div class="hero-ctas">'+
-          '<a href="#/find" class="btn btn-primary">بدور على عيادة</a>'+
+          '<a href="#/need-clinic" class="btn btn-primary">بدور على عيادة</a>'+
           '<a href="#/list-space" class="btn btn-outline-light">عندي مساحة متاحة</a>'+
         '</div>'+
         '<div class="hero-trust">'+icon('shield')+' Matching متخصص للدكاترة — مش مجرد إعلانات عقارية</div>'+
@@ -813,7 +813,7 @@ register('home', function(root){
           '<div class="match-reason yes">'+icon('check')+' الخدمات المطلوبة موجودة</div>'+
           '<div class="match-reason yes">'+icon('check')+' مناسبة للتخصص</div>'+
         '</div>'+
-        '<a href="#/find" class="btn btn-primary btn-block" style="margin-top:18px;">اعمل Match دلوقتي</a>'+
+        '<a href="#/need-clinic" class="btn btn-primary btn-block" style="margin-top:18px;">اعمل Match دلوقتي</a>'+
       '</div>'+
     '</div>'+
     '<div class="hero-search-wrap">'+
@@ -823,7 +823,7 @@ register('home', function(root){
           '<div class="search-field"><label>التخصص</label><select name="specialty"><option value="">كل التخصصات</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
           '<div class="search-field"><label>الأيام المطلوبة</label><select name="shift"><option value="">أي وقت</option>'+SHIFTS.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>';}).join('')+'</select></div>'+
           '<div class="search-field"><label>الميزانية (حتى)</label><input type="number" name="budget" placeholder="مثال: 6000"></div>'+
-          '<button class="btn btn-primary" type="submit">شوف الأماكن المناسبة</button>'+
+          '<button class="btn btn-primary" type="submit">سجّل طلبك</button>'+
         '</div>'+
       '</form>'+
     '</div>'+
@@ -871,11 +871,6 @@ register('home', function(root){
       '<div class="card step-card"><div class="step-num">٣</div><h4>بنرشحلك أفضل Match</h4><p>خوارزمية المطابقة بتختار أقرب الأماكن أو الدكاترة لمتطلباتك.</p></div>'+
       '<div class="card step-card"><div class="step-num">٤</div><h4>ننسق المعاينة والتعاقد</h4><p>بيانات التواصل بتفضل مخفية لحد ما يوافق الفريق وينسق المعاينة.</p></div>'+
     '</div>'+
-  '</section>'+
-
-  '<section class="section container">'+
-    '<div class="results-head"><h2 style="font-size:26px;">مساحات مميزة دلوقتي</h2><a href="#/find" class="btn btn-ghost btn-sm">شوف كل الأماكن '+icon('arrow')+'</a></div>'+
-    '<div class="grid listing-grid">'+allListings().slice(0,6).map(listingCard).join('')+'</div>'+
   '</section>'+
 
   '<section class="section container">'+
@@ -939,7 +934,7 @@ register('home', function(root){
     var f = new FormData(e.target);
     var q = [];
     ['district','specialty','shift','budget'].forEach(function(k){ var v=f.get(k); if(v) q.push(k+'='+encodeURIComponent(v)); });
-    navigate('/find'+(q.length?'?'+q.join('&'):''));
+    navigate('/need-clinic'+(q.length?'?'+q.join('&'):''));
   });
   bindFaqAccordion(root);
 });
@@ -962,178 +957,18 @@ function bindFaqAccordion(root){
   });
 }
 
-/* ===================== TEMP STUBS (replaced in next pass) ===================== */
 /* ===================================================================
-   FIND A CLINIC
+   FIND A CLINIC — no public browsing; redirect to the request form
    =================================================================== */
 register('find', function(root, r){
-  var state = {
-    district: r.query.district || '',
-    gov: '',
-    specialty: r.query.specialty || '',
-    budgetMin: '', budgetMax: r.query.budget || '',
-    rental: '',
-    days: [],
-    facilities: [],
-    medFacilities: [],
-    sort: 'match'
-  };
-  root.innerHTML =
-  '<div class="container page-hero">'+
-    '<div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>دوّر على عيادة</span></div>'+
-    '<h1>دوّر على عيادة تناسبك</h1><p>فلتر بحسب المنطقة والتخصص والأيام والميزانية، وهنرتبلك النتائج بالأنسب لطلبك.</p>'+
-  '</div>'+
-  '<div class="section container" style="padding-top:26px;">'+
-    '<div class="two-col">'+
-      '<div class="card filters-card" id="filtersCard">'+
-        '<div class="filter-group"><label>المحافظة</label><select id="fGov"><option value="">الكل</option>'+GOVERNORATES.map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+'</option>';}).join('')+'</select></div>'+
-        '<div class="filter-group"><label>المنطقة</label><select id="fDistrict"><option value="">كل المناطق</option>'+DISTRICTS.map(function(d){return '<option value="'+esc(d.name)+'">'+esc(d.name)+' ('+esc(d.gov)+')</option>';}).join('')+'</select></div>'+
-        '<div class="filter-group"><label>التخصص الطبي</label><select id="fSpec"><option value="">كل التخصصات</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
-        '<div class="filter-group"><label>الميزانية الشهرية (ج.م)</label><div class="budget-row"><input type="number" id="fBudgetMin" placeholder="من"><span class="muted">—</span><input type="number" id="fBudgetMax" placeholder="إلى"></div></div>'+
-        '<div class="filter-group"><label>نوع الإيجار</label><select id="fRental"><option value="">أي نوع</option>'+RENTAL_TYPES.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+'</option>';}).join('')+'</select></div>'+
-        '<div class="filter-group"><label>الأيام المتاحة</label><div class="check-grid">'+DAYS.map(function(d){return '<label class="check-row"><input type="checkbox" class="fDay" value="'+d.id+'"> '+esc(d.name)+'</label>';}).join('')+'</div></div>'+
-        '<div class="filter-group"><label>المرافق العامة</label><div class="check-grid">'+FACILITIES.map(function(f){return '<label class="check-row"><input type="checkbox" class="fFac" value="'+esc(f)+'"> '+esc(f)+'</label>';}).join('')+'</div></div>'+
-        '<div class="filter-group"><label>المرافق الطبية</label><div class="check-grid">'+MED_FACILITIES.map(function(f){return '<label class="check-row"><input type="checkbox" class="fMed" value="'+esc(f)+'"> '+esc(f)+'</label>';}).join('')+'</div></div>'+
-        '<button class="btn btn-ghost btn-block" id="fReset">إعادة ضبط الفلاتر</button>'+
-      '</div>'+
-      '<div>'+
-        '<div class="results-head"><span class="count" id="resultCount"></span>'+
-          '<select class="sort-select" id="fSort"><option value="match">الأفضل توافقًا</option><option value="price-asc">الأقل سعرًا</option><option value="newest">الأحدث</option><option value="avail">الأكثر توفرًا للأيام</option></select>'+
-        '</div>'+
-        '<div class="grid listing-grid" id="resultsGrid"></div>'+
-      '</div>'+
-    '</div>'+
-  '</div>';
-
-  document.getElementById('fDistrict').value = state.district;
-  document.getElementById('fSpec').value = state.specialty;
-  document.getElementById('fBudgetMax').value = state.budgetMax;
-  if(r.query.shift) document.getElementById('fRental').value = r.query.shift;
-
-  function readState(){
-    state.gov = document.getElementById('fGov').value;
-    state.district = document.getElementById('fDistrict').value;
-    state.specialty = document.getElementById('fSpec').value;
-    state.budgetMin = document.getElementById('fBudgetMin').value;
-    state.budgetMax = document.getElementById('fBudgetMax').value;
-    state.rental = document.getElementById('fRental').value;
-    state.sort = document.getElementById('fSort').value;
-    state.days = Array.prototype.map.call(root.querySelectorAll('.fDay:checked'), function(c){return c.value;});
-    state.facilities = Array.prototype.map.call(root.querySelectorAll('.fFac:checked'), function(c){return c.value;});
-    state.medFacilities = Array.prototype.map.call(root.querySelectorAll('.fMed:checked'), function(c){return c.value;});
-  }
-  function apply(){
-    readState();
-    var items = allListings().filter(function(l){
-      if(state.gov && l.gov!==state.gov) return false;
-      if(state.district && l.district!==state.district) return false;
-      if(state.specialty && l.specialties.indexOf(state.specialty)===-1) return false;
-      if(state.budgetMin && l.price < Number(state.budgetMin)) return false;
-      if(state.budgetMax && l.price > Number(state.budgetMax)) return false;
-      if(state.rental && ['morning','evening','full','flex'].indexOf(state.rental)!==-1 && l.shift!==state.rental) return false;
-      if(state.days.length && !state.days.some(function(d){return l.days.indexOf(d)!==-1;})) return false;
-      if(state.facilities.length && !state.facilities.every(function(f){return l.facilities.indexOf(f)!==-1;})) return false;
-      if(state.medFacilities.length && !state.medFacilities.every(function(f){return l.medFacilities.indexOf(f)!==-1;})) return false;
-      return true;
-    });
-    var req = {district:state.district, gov:state.gov, specialty:state.specialty, budgetMax:state.budgetMax, days:state.days, facilities:state.facilities.concat(state.medFacilities)};
-    var scored = items.map(function(l){ return computeMatch(req,l); });
-    if(state.sort==='match') scored.sort(function(a,b){return b.score-a.score;});
-    else if(state.sort==='price-asc') scored.sort(function(a,b){return a.listing.price-b.listing.price;});
-    else if(state.sort==='newest') scored.reverse();
-    else if(state.sort==='avail') scored.sort(function(a,b){return b.listing.days.length-a.listing.days.length;});
-    var grid = document.getElementById('resultsGrid');
-    document.getElementById('resultCount').textContent = scored.length + ' مكان متاح';
-    if(!scored.length){
-      grid.innerHTML = '<div class="empty-state card" style="grid-column:1/-1;">'+icon('search')+'<h3>مفيش نتائج مطابقة</h3><p>جرب توسّع نطاق الفلاتر، أو قدّم طلبك واحنا هنبحث لك.</p><a href="#/need-clinic" class="btn btn-primary btn-sm" style="margin-top:14px;">قدّم طلب دلوقتي</a></div>';
-      return;
-    }
-    grid.innerHTML = scored.map(function(m){ return listingCard(m.listing); }).join('');
-  }
-  root.querySelectorAll('#fGov,#fDistrict,#fSpec,#fBudgetMin,#fBudgetMax,#fRental,#fSort').forEach(function(el){ el.addEventListener('change', apply); });
-  root.querySelectorAll('.fDay,.fFac,.fMed').forEach(function(el){ el.addEventListener('change', apply); });
-  document.getElementById('fReset').addEventListener('click', function(){
-    root.querySelectorAll('#filtersCard select').forEach(function(s){ s.value=''; });
-    root.querySelectorAll('#filtersCard input[type=checkbox]').forEach(function(c){ c.checked=false; });
-    root.querySelectorAll('#filtersCard input[type=number]').forEach(function(i){ i.value=''; });
-    apply();
-  });
-  apply();
+  var qs = Object.keys(r.query||{}).filter(function(k){return r.query[k];}).map(function(k){return k+'='+encodeURIComponent(r.query[k]);}).join('&');
+  navigate('/need-clinic'+(qs?'?'+qs:''));
 });
-
 /* ===================================================================
-   CLINIC DETAILS
+   CLINIC DETAILS — disabled; no individual unit pages for the public
    =================================================================== */
 register('clinic', function(root, r){
-  var id = r.seg[1];
-  var l = findListing(id);
-  if(!l){
-    root.innerHTML = '<div class="section container empty-state">'+icon('info')+'<h3>المكان غير موجود</h3><p>يمكن يكون الرابط غير صحيح.</p><a href="#/find" class="btn btn-primary btn-sm" style="margin-top:14px;">رجوع للبحث</a></div>';
-    return;
-  }
-  var similar = allListings().filter(function(x){ return x.id!==l.id && (x.district===l.district || x.specialties.some(function(s){return l.specialties.indexOf(s)!==-1;})); }).slice(0,3);
-  var verifiedBadge = l.verified ? '<span class="badge-verified">'+icon('shield')+' موثّقة من فريقنا</span>' : '<span class="badge-pending">'+icon('clockx')+' قيد المراجعة والتحقق</span>';
-  root.innerHTML =
-  '<div class="section container" style="padding-top:26px;">'+
-    '<div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <a href="#/find">دوّر على عيادة</a> '+icon('chev')+' <span>'+esc(l.title)+'</span></div>'+
-    '<div class="gallery-grid">'+
-      '<div class="g-tile g-main">'+icon('building')+'<span>صور تعريفية للمساحة — الصور الحقيقية تُضاف بعد المراجعة</span></div>'+
-      '<div class="gallery-stack"><div class="g-tile">'+icon('bed')+'<span>غرفة الكشف</span></div><div class="g-tile">'+icon('users')+'<span>صالة الانتظار</span></div></div>'+
-    '</div>'+
-    '<div class="details-layout">'+
-      '<div>'+
-        '<div class="flex" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-top:22px;">'+
-          '<div><span class="chip chip-teal">'+esc(l.type)+'</span><h1 style="margin-top:12px;">'+esc(l.title)+'</h1>'+
-          '<div class="listing-loc" style="margin-top:8px;">'+icon('pin')+esc(l.district)+' — '+esc(l.gov)+'</div></div>'+
-          verifiedBadge+
-        '</div>'+
-        '<div class="district-note" style="margin-top:18px;">'+icon('lock')+' <span>بيتم عرض المنطقة أو الحي فقط للحفاظ على خصوصية المكان. العنوان التفصيلي بيتشارك بعد موافقة الطرفين وتنسيق فريقنا للمعاينة.</span></div>'+
-        '<div class="card card-pad" style="margin-top:22px;"><h4 style="font-size:16px;margin-bottom:12px;">وصف المساحة</h4><p class="muted">'+esc(l.desc)+'</p></div>'+
-        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">التخصصات المناسبة</h4><div class="spec-row">'+l.specialties.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join('')+'</div></div>'+
-        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">الأيام المتاحة والشيفت</h4><div class="avail-strip">'+DAYS.map(function(d){return '<div class="day-pill'+(l.days.indexOf(d.id)!==-1?' on':'')+'">'+esc(d.short)+'</div>';}).join('')+'</div><p class="muted" style="margin-top:12px;">الشيفت: '+shiftName(l.shift)+'</p></div>'+
-        '<div class="card card-pad" style="margin-top:16px;"><h4 style="font-size:16px;margin-bottom:12px;">المرافق العامة</h4><div class="facility-grid">'+l.facilities.map(function(f){return '<div class="facility-item">'+icon('check')+esc(f)+'</div>';}).join('')+'</div></div>'+
-        '<div class="card card-pad" style="margin-top:16px;">'+
-          '<h4 style="font-size:16px;margin-bottom:12px;">المرافق والتجهيزات الطبية</h4>'+
-          (l.medFacilities.length ? '<div class="facility-grid">'+l.medFacilities.map(function(f){return '<div class="facility-item">'+icon('check')+esc(f)+'</div>';}).join('')+'</div>' : '<p class="muted">لا توجد تجهيزات طبية إضافية مذكورة — تقدر تتفق على التجهيز المطلوب مباشرة مع صاحب المكان بعد التنسيق.</p>')+
-        '</div>'+
-      '</div>'+
-      '<div class="sticky-side">'+
-        '<div class="card card-pad">'+
-          '<div class="listing-price" style="font-size:22px;">'+l.price.toLocaleString('en-US')+' <span>ج.م / شهريًا</span></div>'+
-          '<p class="muted" style="font-size:13px;margin-top:6px;">السعر تقريبي ونهائيًا بيتحدد حسب الأيام والشيفت المطلوب.</p>'+
-          '<button class="btn btn-primary btn-block" style="margin-top:16px;" id="interestBtn">أنا مهتم بالمكان ده</button>'+
-          '<div id="interestForm" hidden style="margin-top:16px;display:grid;gap:10px;">'+
-            '<div class="field"><input type="text" id="intName" placeholder="اسمك بالكامل"></div>'+
-            '<div class="field"><input type="tel" id="intPhone" placeholder="رقم الموبايل"></div>'+
-            '<div class="field"><select id="intSpec"><option value="">تخصصك الطبي</option>'+SPECIALTIES.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div>'+
-            '<button class="btn btn-dark btn-block" id="intSubmit">إرسال طلب الاهتمام</button>'+
-            '<p class="hint" style="text-align:center;">هيتواصل معاك فريقنا لتنسيق المعاينة — رقمك وبياناتك متاحة لفريقنا فقط.</p>'+
-          '</div>'+
-          '<div id="interestDone" hidden style="margin-top:16px;text-align:center;">'+icon('check')+'<p style="font-weight:700;margin-top:8px;">تم إرسال طلبك بنجاح ✔</p><p class="muted" style="font-size:13px;margin-top:6px;">هيتواصل معاك فريقنا خلال ٤٨ ساعة لتنسيق المعاينة.</p></div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-    (similar.length ? '<div style="margin-top:44px;"><h3 style="font-size:20px;margin-bottom:18px;">أماكن مشابهة</h3><div class="grid listing-grid">'+similar.map(listingCard).join('')+'</div></div>' : '')+
-  '</div>';
-
-  document.getElementById('interestBtn').addEventListener('click', function(){
-    document.getElementById('interestForm').hidden = false;
-    this.hidden = true;
-  });
-  document.getElementById('intSubmit').addEventListener('click', function(){
-    var name = document.getElementById('intName').value.trim();
-    var phone = document.getElementById('intPhone').value.trim();
-    if(!name || !phone){ toast('من فضلك اكتب اسمك ورقم موبايلك'); return; }
-    var btn = document.getElementById('intSubmit');
-    btn.disabled = true;
-    supaInsert('interests', {listing_id:l.id, name:name, phone:phone, specialty:document.getElementById('intSpec').value}).then(function(){
-      document.getElementById('interestForm').hidden = true;
-      document.getElementById('interestDone').hidden = false;
-    }).catch(function(){
-      btn.disabled = false;
-      toast('حصل خطأ في الإرسال، حاول تاني.');
-    });
-  });
+  navigate('/need-clinic');
 });
 /* ===================== small form helpers ===================== */
 function fieldWrap(id, labelText, inputHtml, hint){
@@ -1232,10 +1067,11 @@ register('list-space', function(root){
 /* ===================================================================
    I NEED A CLINIC (doctor demand intake)
    =================================================================== */
-register('need-clinic', function(root){
+register('need-clinic', function(root, r){
+  r = r || {query:{}};
   root.innerHTML =
   '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>بدور على عيادة</span></div>'+
-  '<h1>اشتغل من عيادة مجهزة في المكان والأيام اللي تناسبك</h1><p>سجّل طلبك وهنرشحلك فورًا أقرب الأماكن المتاحة حسب تخصصك وميزانيتك.</p></div>'+
+  '<h1>اشتغل من عيادة مجهزة في المكان والأيام اللي تناسبك</h1><p>سجّل بياناتك، وفريقنا هيراجع طلبك ويتواصل معاك بأنسب الأماكن المتاحة حسب تخصصك وميزانيتك.</p></div>'+
   '<div class="section container" id="formSection">'+
     '<div class="card form-card">'+
       '<form id="needForm" novalidate>'+
@@ -1253,10 +1089,15 @@ register('need-clinic', function(root){
         '<div class="field field-full" style="margin-top:16px;"><label>الخدمات والمرافق المطلوبة</label>'+checkGroup('rfac',FACILITIES.concat(MED_FACILITIES),3)+'</div>'+
         '<div class="field field-full" style="margin-top:16px;">'+fieldWrap('drNotes','ملاحظات إضافية (اختياري)','<textarea id="drNotes" placeholder="أي تفاصيل تانية تساعدنا نرشحلك مكان أدق..."></textarea>')+'</div>'+
         '<label class="check-inline" style="margin-top:6px;"><input type="checkbox" id="drAgree"> موافق على <a href="#/terms" style="color:var(--teal-dark);text-decoration:underline;">الشروط والأحكام</a> وعلى إن '+BRAND.name+' تتوسط في عملية التوفيق كطرف وسيط فقط.</label>'+
-        '<div class="form-actions"><button type="submit" class="btn btn-primary">شوف الأماكن المناسبة</button></div>'+
+        '<div class="form-actions"><button type="submit" class="btn btn-primary">أرسل طلبك</button></div>'+
       '</form>'+
     '</div>'+
   '</div>';
+
+  if(r.query.district) document.getElementById('drDistrict').value = r.query.district;
+  if(r.query.specialty) document.getElementById('drSpec').value = r.query.specialty;
+  if(r.query.budget) document.getElementById('drBudget').value = r.query.budget;
+  if(r.query.shift) document.getElementById('drRental').value = r.query.shift;
 
   root.querySelector('#needForm').addEventListener('submit', function(e){
     e.preventDefault();
@@ -1297,7 +1138,7 @@ register('need-clinic', function(root){
       })); }catch(err){}
       navigate('/matches?code='+code);
     }).catch(function(){
-      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='شوف الأماكن المناسبة'; }
+      if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='أرسل طلبك'; }
       toast('حصل خطأ في إرسال البيانات، حاول تاني.');
     });
   });
@@ -1307,7 +1148,7 @@ register('need-clinic', function(root){
    MATCHING RESULTS
    =================================================================== */
 register('matches', async function(root, r){
-  var req = null, isDemo = false;
+  var req = null;
   var code = r.query.code;
   if(code){
     try{
@@ -1319,35 +1160,18 @@ register('matches', async function(root, r){
     try{ var last = sessionStorage.getItem('cs_last_request'); if(last) req = JSON.parse(last); }catch(e){}
   }
   if(!req){
-    isDemo = true;
-    req = {name:'', specialty:'باطنة', gov:'', district:'', budgetMax:'7000', days:['sat','mon','wed'], facilities:['استقبال','واي فاي','تكييف']};
+    navigate('/need-clinic');
+    return;
   }
-  var matches = topMatches(req, 6).filter(function(m){ return m.score>0; });
   root.innerHTML =
-  '<div class="container page-hero"><div class="breadcrumb"><a href="#/">الرئيسية</a> '+icon('chev')+' <span>نتائج المطابقة</span></div>'+
-  '<h1>أفضل الأماكن المتاحة ليك دلوقتي</h1>'+
-  (isDemo ?
-    '<div class="legal-note" style="margin-top:16px;">'+icon('info')+' دي نتيجة توضيحية بمواصفات افتراضية (تخصص باطنة، ميزانية حتى ٧,٠٠٠ ج.م). <a href="#/need-clinic" style="text-decoration:underline;">قدّم طلبك الحقيقي دلوقتي</a> لنتيجة مخصصة ليك.</div>'
-  : '<p>طلبك رقم <b>'+esc(req.trackingCode||'')+'</b> تحت المراجعة، وده أفضل الأماكن المتاحة حاليًا حسب بياناتك.</p>')+
-  '</div>'+
-  '<div class="section container" style="padding-top:10px;">'+
-    (matches.length ? '<div class="grid" style="gap:16px;">'+matches.map(function(m){ return matchCard(m); }).join('')+'</div>' :
-      '<div class="empty-state card">'+icon('search')+'<h3>لسه مفيش أماكن مطابقة كفاية</h3><p>هنكمل نبحث لك ونضيف أماكن جديدة قريب.</p></div>')+
-    '<div class="center" style="margin-top:30px;"><a href="#/need-clinic" class="btn btn-ghost">قدّم طلب جديد</a></div>'+
+  '<div class="section container" style="padding-top:60px;">'+
+    '<div class="card success-box" style="max-width:560px;margin:0 auto;">'+icon('check')+
+    '<h2 style="margin-top:14px;">تم استلام طلبك بنجاح!</h2>'+
+    '<p class="muted" style="margin-top:10px;">فريقنا هيراجع طلبك ويرشحلك أنسب الأماكن المتاحة حسب تخصصك وميزانيتك وأيامك، وهيتواصل معاك على رقم الموبايل اللي كتبته خلال ٤٨ ساعة.</p>'+
+    (req.trackingCode ? '<div class="code-pill" style="margin-top:16px;">'+esc(req.trackingCode)+'</div><p class="hint" style="margin-top:10px;">احتفظ بالكود ده لمتابعة حالة طلبك من لوحة تحكم الدكتور.</p>' : '')+
+    '<div class="hero-ctas" style="justify-content:center;margin-top:20px;"><a href="#/" class="btn btn-primary">الرئيسية</a><a href="#/need-clinic" class="btn btn-ghost">تعديل الطلب / طلب جديد</a></div>'+
+    '</div>'+
   '</div>';
-
-  root.querySelectorAll('[data-int]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var lid = btn.getAttribute('data-int');
-      btn.disabled = true;
-      supaInsert('interests', {listing_id:lid, name:req.name||'', phone:req.phone||'', specialty:req.specialty||''}).then(function(){
-        btn.textContent = 'تم إرسال الاهتمام ✔';
-      }).catch(function(){
-        btn.disabled = false;
-        toast('حصل خطأ، حاول تاني.');
-      });
-    });
-  });
 });
 function matchCard(m){
   var l = m.listing;
@@ -1576,7 +1400,6 @@ register('dashboard-doctor', async function(root, r){
   if(!reqObj){
     root.innerHTML = dashLoginPrompt('doctor'); bindDashLogin(root,'doctor'); return;
   }
-  var matches = topMatches(reqObj, 4).filter(function(m){return m.score>0;});
   root.innerHTML =
   '<div class="section container">'+
     '<div class="dash-header"><div><span class="chip chip-teal">'+icon('doctor')+' لوحة تحكم الدكتور</span><h1 style="margin-top:10px;font-size:26px;">أهلًا، '+esc(reqObj.name)+'</h1></div>'+
@@ -1585,10 +1408,8 @@ register('dashboard-doctor', async function(root, r){
       '<div class="card kpi-card"><div class="val">'+esc(reqObj.trackingCode)+'</div><div class="lbl">كود التتبع</div></div>'+
       '<div class="card kpi-card"><div class="val">'+esc(reqObj.specialty)+'</div><div class="lbl">التخصص</div></div>'+
       '<div class="card kpi-card"><div class="val">'+(reqObj.budgetMax? Number(reqObj.budgetMax).toLocaleString('en-US'):'—')+'</div><div class="lbl">الميزانية القصوى</div></div>'+
-      '<div class="card kpi-card"><div class="val">'+matches.length+'</div><div class="lbl">أماكن مرشّحة</div></div>'+
     '</div>'+
-    '<h3 style="font-size:18px;margin-bottom:14px;">الأماكن المرشّحة لطلبك</h3>'+
-    (matches.length? '<div class="grid" style="gap:14px;">'+matches.map(matchCard).join('')+'</div>' : '<div class="empty-state card">'+icon('search')+'<p>هنضيف ترشيحات جديدة بمجرد ما فريقنا يراجع طلبك.</p></div>')+
+    '<div class="empty-state card">'+icon('search')+'<h3>طلبك تحت المراجعة</h3><p>فريقنا بيراجع بياناتك ويدوّر على أنسب الأماكن المتاحة، وهيتواصل معاك على رقم الموبايل اللي سجّلته بمجرد ما يكون في ترشيح مناسب.</p></div>'+
     '<div class="card card-pad" style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">'+
       '<div><div style="font-weight:800;">عايز تعدّل طلبك؟</div><div class="muted" style="font-size:13.5px;">تقدر تلغي الطلب الحالي وتسجّل طلب جديد بمواصفات مختلفة.</div></div>'+
       '<button class="btn btn-ghost btn-sm" id="cancelReq">'+icon('trash')+' إلغاء الطلب</button>'+
@@ -1603,16 +1424,6 @@ register('dashboard-doctor', async function(root, r){
     }).catch(function(){
       btn.disabled = false;
       toast('حصل خطأ، حاول تاني.');
-    });
-  });
-  root.querySelectorAll('[data-int]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      btn.disabled = true;
-      supaInsert('interests', {listing_id:btn.getAttribute('data-int'), name:reqObj.name, phone:reqObj.phone, specialty:reqObj.specialty}).then(function(){
-        btn.textContent='تم إرسال الاهتمام ✔';
-      }).catch(function(){
-        btn.disabled=false; toast('حصل خطأ، حاول تاني.');
-      });
     });
   });
 });
