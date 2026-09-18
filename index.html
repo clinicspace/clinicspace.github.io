@@ -1141,6 +1141,20 @@ function supaInsert(table, row){
   return fetch(SUPA_URL+'/rest/v1/'+table, { method:'POST', headers:supaHeaders(), body:JSON.stringify(row) })
     .then(function(res){ if(!res.ok){ return res.text().then(function(t){ throw new Error('supaInsert:'+res.status+':'+t); }); } return true; });
 }
+
+/* ===================== EMAIL NOTIFICATIONS (Web3Forms — best-effort, never blocks the form) ===================== */
+var WEB3FORMS_KEY = 'ba7bc786-f640-4bf2-9773-b2a6391db6be';
+function notifyEmail(subject, fields){
+  try{
+    var body = {access_key: WEB3FORMS_KEY, subject: subject, from_name: 'ClinicSpace'};
+    for(var k in (fields||{})) body[k] = fields[k];
+    fetch('https://api.web3forms.com/submit', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(body)
+    }).catch(function(){});
+  }catch(e){}
+}
 function callApi(action, payload){
   var body = {action:action};
   for(var k in (payload||{})) body[k] = payload[k];
@@ -1645,6 +1659,12 @@ register('list-space', function(root){
     if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
     supaInsert('listings', listing).then(function(){
       ensureListings(true);
+      notifyEmail('تسجيل مساحة جديدة في '+BRAND.name, {
+        submission_type: 'مساحة جديدة (عيادة/غرفة)',
+        الاسم: name, الموبايل: phone, البريد: listing.owner_email || '-',
+        المنطقة: district, النوع: type, السعر: price,
+        كود_التتبع: code
+      });
       document.getElementById('formSection').innerHTML =
         '<div class="card success-box">'+icon('check')+
         '<h2 style="margin-top:14px;">تم استلام بيانات مساحتك!</h2>'+
@@ -1727,6 +1747,12 @@ register('need-clinic', function(root, r){
     var submitBtn = root.querySelector('#needForm button[type=submit]');
     if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
     supaInsert('requests', reqObj).then(function(){
+      notifyEmail('تسجيل طلب دكتور جديد في '+BRAND.name, {
+        submission_type: 'طلب دكتور (بدور على عيادة)',
+        الاسم: name, الموبايل: phone, البريد: email || '-',
+        التخصص: spec, المنطقة: district || 'أي منطقة',
+        كود_التتبع: code
+      });
       try{ sessionStorage.setItem('cs_last_request', JSON.stringify({
         name:name, phone:phone, email:email, specialty:spec, gov:gov, district:district,
         rental:rental, budgetMax:budgetVal, days:days, facilities:facilities,
@@ -1918,6 +1944,12 @@ register('contact', function(root){
     var submitBtn = root.querySelector('#contactForm button[type=submit]');
     if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='جاري الإرسال...'; }
     supaInsert('contacts', {name:name, contact:contact, subject:document.getElementById('cSubject').value, message:msg}).then(function(){
+      notifyEmail('رسالة تواصل جديدة في '+BRAND.name, {
+        submission_type: 'رسالة تواصل',
+        الاسم: name, الموبايل_أو_البريد: contact,
+        الموضوع: document.getElementById('cSubject').value || '-',
+        الرسالة: msg
+      });
       document.getElementById('contactFormCard').innerHTML = '<div class="success-box">'+icon('check')+'<h3 style="margin-top:12px;">تم إرسال رسالتك</h3><p class="muted" style="margin-top:8px;">هيتواصل معاك فريقنا في أقرب وقت.</p></div>';
     }).catch(function(){
       if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='إرسال الرسالة'; }
